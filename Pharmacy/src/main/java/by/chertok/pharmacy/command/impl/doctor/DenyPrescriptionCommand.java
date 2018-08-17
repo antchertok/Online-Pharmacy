@@ -1,12 +1,13 @@
-package main.java.by.chertok.pharmacy.command.impl.doctor;
+package by.chertok.pharmacy.command.impl.doctor;
 
-import main.java.by.chertok.pharmacy.command.ICommand;
-import main.java.by.chertok.pharmacy.command.Pages;
-import main.java.by.chertok.pharmacy.entity.Prescription;
-import main.java.by.chertok.pharmacy.exception.ServiceException;
-import main.java.by.chertok.pharmacy.service.PrescriptionService;
-import main.java.by.chertok.pharmacy.util.road.Path;
-import main.java.by.chertok.pharmacy.util.wrapper.Wrapper;
+import by.chertok.pharmacy.command.resources.AttributeName;
+import by.chertok.pharmacy.command.ICommand;
+import by.chertok.pharmacy.command.resources.PageStorage;
+import by.chertok.pharmacy.entity.Prescription;
+import by.chertok.pharmacy.exception.ServiceException;
+import by.chertok.pharmacy.service.PrescriptionService;
+import by.chertok.pharmacy.util.path.Path;
+import by.chertok.pharmacy.util.wrapper.Wrapper;
 import org.apache.log4j.Logger;
 
 import java.util.Optional;
@@ -14,9 +15,11 @@ import java.util.Optional;
 
 public class DenyPrescriptionCommand implements ICommand {
     private static final Logger LOGGER = Logger.getLogger(DenyPrescriptionCommand.class);
+    private static final String SUCCESS = "Success";
+    private static final String FAIL = "Failed";
     private PrescriptionService prescriptionService;
 
-    public DenyPrescriptionCommand(PrescriptionService prescriptionService){
+    public DenyPrescriptionCommand(PrescriptionService prescriptionService) {
         this.prescriptionService = prescriptionService;
     }
 
@@ -30,24 +33,24 @@ public class DenyPrescriptionCommand implements ICommand {
      */
     @Override
     public Path execute(Wrapper wrapper) {
-        try{
-            long prescriptionId = Long.parseLong(wrapper.getRequestParameter("prescriptionId"));
+        try {
+            long prescriptionId = Long.parseLong(wrapper.getRequestParameter(AttributeName.PRESCRIPTION_ID));
             Optional<Prescription> prescription = prescriptionService.readById(prescriptionId);
 
-            if(prescription.isPresent()){
+            if (prescription.isPresent()) {
                 Prescription approvedPrescription = prescription.get();
                 approvedPrescription.setApproved(false);
                 prescriptionService.update(approvedPrescription);
-                wrapper.setRequestAttribute("prescriptionControl", "Success");
+                wrapper.setRequestAttribute(AttributeName.PRESC_CONTROL, SUCCESS);
             } else {
-                wrapper.setRequestAttribute("prescriptionControl", "Failure");
+                wrapper.setRequestAttribute(AttributeName.PRESC_CONTROL, FAIL);
             }
 
-            return new Path(false, Pages.PRESCRIPTIONS);
-        } catch(ServiceException e){
+            return new Path(false, PageStorage.LIST_PRESCRIPTIONS);
+        } catch (ServiceException e) {
             LOGGER.error(e.getMessage());
-            wrapper.setSessionAttribute("errMsg", e.getMessage());
-            return new Path(false, Pages.ERROR);
+            wrapper.setSessionAttribute(AttributeName.ERROR_MSG, e.getMessage());
+            return new Path(false, PageStorage.ERROR);
         }
     }
 }

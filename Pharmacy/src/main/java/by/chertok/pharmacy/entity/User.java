@@ -1,4 +1,4 @@
-package main.java.by.chertok.pharmacy.entity;
+package by.chertok.pharmacy.entity;
 
 public class User extends BaseEntity {
 

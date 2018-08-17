@@ -1,9 +1,10 @@
-package main.java.by.chertok.pharmacy.command.impl.common.user;
+package by.chertok.pharmacy.command.impl.common.user;
 
-import main.java.by.chertok.pharmacy.command.ICommand;
-import main.java.by.chertok.pharmacy.command.Pages;
-import main.java.by.chertok.pharmacy.util.road.Path;
-import main.java.by.chertok.pharmacy.util.wrapper.Wrapper;
+import by.chertok.pharmacy.command.resources.AttributeName;
+import by.chertok.pharmacy.command.ICommand;
+import by.chertok.pharmacy.command.resources.PageStorage;
+import by.chertok.pharmacy.util.path.Path;
+import by.chertok.pharmacy.util.wrapper.Wrapper;
 
 public class LogOutCommand implements ICommand {
 
@@ -16,11 +17,9 @@ public class LogOutCommand implements ICommand {
      * to go forward
      */
     @Override
-    public Path execute(Wrapper wrapper){
-        wrapper.setSessionAttribute("user", null);
-        wrapper.setSessionAttribute("total", 0.0);
-        return new Path(true, Pages.START_PAGE);
-//        request.getSession().removeAttribute("user");
-//        request.getRequestDispatcher("index.jsp").forward(request, response);
+    public Path execute(Wrapper wrapper) {
+        wrapper.setSessionAttribute(AttributeName.USER, null);
+        wrapper.setSessionAttribute(AttributeName.TOTAL, 0.0);
+        return new Path(false, PageStorage.START_PAGE);
     }
 }

@@ -1,6 +1,4 @@
-package main.java.by.chertok.pharmacy.entity;
-
-import java.util.Objects;
+package by.chertok.pharmacy.entity;
 
 /**
  * Class representing Drug entity

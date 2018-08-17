@@ -1,16 +1,20 @@
-package main.java.by.chertok.pharmacy.command.impl.pharmacist;
+package by.chertok.pharmacy.command.impl.pharmacist;
 
-import main.java.by.chertok.pharmacy.command.ICommand;
-import main.java.by.chertok.pharmacy.command.Pages;
-import main.java.by.chertok.pharmacy.entity.Drug;
-import main.java.by.chertok.pharmacy.exception.ServiceException;
-import main.java.by.chertok.pharmacy.service.DrugService;
-import main.java.by.chertok.pharmacy.util.road.Path;
-import main.java.by.chertok.pharmacy.util.wrapper.Wrapper;
+import by.chertok.pharmacy.command.resources.AttributeName;
+import by.chertok.pharmacy.command.ICommand;
+import by.chertok.pharmacy.command.resources.PageStorage;
+import by.chertok.pharmacy.entity.Drug;
+import by.chertok.pharmacy.exception.ServiceException;
+import by.chertok.pharmacy.service.DrugService;
+import by.chertok.pharmacy.util.path.Path;
+import by.chertok.pharmacy.util.wrapper.Wrapper;
 import org.apache.log4j.Logger;
 
 public class AddDrugCommand implements ICommand {
     private static final Logger LOGGER = Logger.getLogger(AddDrugCommand.class);
+    private static final String SUCCESS = "Drug added successfully";
+    private static final String FAIL = "This drug is already exists";
+    private static final String INVALID_PARAMETERS = "Invalid parameters";
     private DrugService drugService;
 
     public AddDrugCommand(DrugService drugService) {
@@ -28,33 +32,33 @@ public class AddDrugCommand implements ICommand {
     @Override
     public Path execute(Wrapper wrapper) {
         Path path = new Path();
-        path.setUrl(Pages.ALTERNATING_DRUGS);
+        path.setUrl(PageStorage.ALTERNATING_DRUGS);
 
         try {
             Drug drug = new Drug(0);
-            drug.setName(wrapper.getRequestParameter("name"));
-            drug.setDose(Integer.parseInt(wrapper.getRequestParameter("dose")));
-            drug.setPrescription(Integer.parseInt(wrapper.getRequestParameter("prescription")));
-            drug.setPrice(Double.parseDouble(wrapper.getRequestParameter("price")));
+            drug.setName(wrapper.getRequestParameter(AttributeName.NAME));
+            drug.setDose(Integer.parseInt(wrapper.getRequestParameter(AttributeName.DOSE)));
+            drug.setPrescription(Integer.parseInt(wrapper.getRequestParameter(AttributeName.PRESCRIPTION)));
+            drug.setPrice(Double.parseDouble(wrapper.getRequestParameter(AttributeName.PRICE)));
 
             if (drugService.create(drug)) {
-                wrapper.setRequestAttribute("infoMsg", "Drug added successfully.");
+                wrapper.setRequestAttribute(AttributeName.INFO_MSG, SUCCESS);
+                path.setUrl(PageStorage.START_PAGE);
                 path.setForward(false);
-                return path;
             } else {
-                wrapper.setRequestAttribute("infoMsg", "This drug is already exists.");
+                wrapper.setRequestAttribute(AttributeName.INFO_MSG, FAIL);
                 path.setForward(true);
-                return path;
             }
+            return path;
         } catch (NumberFormatException e) {
-            LOGGER.error(e);
-            wrapper.setRequestAttribute("errorMsg", "Invalid parameters");
+            LOGGER.error(e.getMessage());
+            wrapper.setRequestAttribute(AttributeName.INFO_MSG, INVALID_PARAMETERS);
             path.setForward(true);
             return path;
-        } catch(ServiceException e){
+        } catch (ServiceException e) {
             LOGGER.error(e.getMessage());
-            wrapper.setSessionAttribute("errMsg", e.getMessage());
-            return new Path(false, Pages.ERROR);
+            wrapper.setSessionAttribute(AttributeName.ERROR_MSG, e.getMessage());
+            return new Path(false, PageStorage.ERROR);
         }
     }
 }

@@ -1,8 +1,8 @@
-package main.java.by.chertok.pharmacy.dao.util;
+package by.chertok.pharmacy.dao.util;
 
-import main.java.by.chertok.pharmacy.exception.DaoException;
-import main.java.by.chertok.pharmacy.exception.EmptyResultException;
-import main.java.by.chertok.pharmacy.pool.ConnectionPool;
+import by.chertok.pharmacy.exception.DaoException;
+import by.chertok.pharmacy.exception.EmptyResultException;
+import by.chertok.pharmacy.pool.ConnectionPool;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,8 +11,9 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 /**
  * Class allowing to unify handling util requests
@@ -20,6 +21,13 @@ import java.util.Map;
 public class JdbcHelper {
 
     private ConnectionPool connectionPool;
+    private static final String TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    private static final String EMPTY_RESULT_MSG = "No data matches in database...";
+    private static final String FAILED_QUERY_MSG = "Failed to execute query";
+    private static final String FAILED_TO_LOAD_MSG = "Failed to load objects from result set";
+    private static final String FAILED_TO_ROLL_BACK_MSG = "Failed to roll back";
+    private static final String FAILED_FINISH_TRANSACTION_MSG = "Transaction wasn't finished";
+    private static final String INVALID_AMOUNT_OF_PARAMETERS_MSG = "Invalid amount of arguments";
 
     public JdbcHelper(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
@@ -34,7 +42,7 @@ public class JdbcHelper {
      *                   them into the request
      * @return the number of affected rows in the util after successful
      * execution of request
-     * @throws DaoException
+     * @throws DaoException if failed to execute any stage
      */
     public int executeUpdate(String sqlRequest, Object[] parameters) throws DaoException {
         try (Connection connection = connectionPool.getConnection();
@@ -42,70 +50,49 @@ public class JdbcHelper {
 
             return buildStatement(statement, parameters).executeUpdate();
         } catch (InterruptedException | SQLException e) {
-            throw new DaoException(e);
+            throw new DaoException(FAILED_QUERY_MSG, e);
         }
     }
 
-//    public int executeManyUpdates(String[] sqlRequests, Object[][] parameters) throws DaoException{
-//        if(sqlRequests.length != parameters.length){
-//            throw new DaoException("Invalid amount of arguments");
-//        }
-//
-//        try (Connection connection = connectionPool.getConnection()){
-//            PreparedStatement statement = connection.prepareStatement(sqlRequests[0]);
-//            buildStatement(statement, parameters[0]);
-//
-//            for(int i = 1; i < sqlRequests.length; i++){
-//                statement.addBatch();
-//            }
-//
-//        }catch (InterruptedException | SQLException e){
-//            throw new DaoException(e);
-//        }
-//    }
-
-
-    //TODO ЗАПИЛИТЬ
     /**
      * Method for making UPDATE, DELETE and INSERT requests to util
      *
-     * @param sqlRequests
-     * @param parameters
-     * @return the number of affected rows in the util after successful
-     * execution of request
-     * @throws DaoException
+     * @param sqlRequests array of strings describing sql requests
+     * @param parameters  array of parameters to insert into sql request
+     * @return the number of executed updates
+     * @throws DaoException if failed to execute any stage
+     * @throws SQLException if failed to close connection or statement
      */
-    public int executeTransaction(String[] sqlRequests, Object[][] parameters) throws DaoException, SQLException{
-        if(sqlRequests.length != parameters.length){
-            throw new DaoException("Invalid amount of arguments");
+    public int executeMassiveUpdate(String[] sqlRequests, Object[][] parameters) throws DaoException, SQLException {
+        if (sqlRequests.length != parameters.length) {
+            throw new DaoException(INVALID_AMOUNT_OF_PARAMETERS_MSG);
         }
 
         Connection connection = null;
         PreparedStatement statement = null;
-        try{
+        try {
             connection = connectionPool.getConnection();
             connection.setAutoCommit(false);
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 
-            for(int i = 0; i < sqlRequests.length; i++){
+            int i = 0;
+            for (; i < sqlRequests.length; i++) {
                 statement = connection.prepareStatement(sqlRequests[i]);
-                System.out.println(i);
                 buildStatement(statement, parameters[i]).executeUpdate();
             }
             connection.commit();
 
-            return 1;
+            return i;
         } catch (InterruptedException | SQLException e) {
-            if(connection != null){
+            if (connection != null) {
                 rollback(connection);
             }
-            e.printStackTrace();
-            throw new DaoException("Transaction wasn't finished ", e);
+            throw new DaoException(FAILED_FINISH_TRANSACTION_MSG, e);
         } finally {
-            if(connection != null) {
+            if (connection != null) {
                 connection.close();
             }
-            if(statement != null) {
+            if (statement != null) {
                 statement.close();
             }
         }
@@ -123,21 +110,17 @@ public class JdbcHelper {
      *                   RowMapper} for assembling an entity from a single line from
      *                   {@link ResultSet ResultSet}
      * @return {@link ArrayList ArrayList} filled with entities from ResultSet
-     * @throws EmptyResultException
-     * @throws DaoException
+     * @throws DaoException if failed to execute any stage
      */
     public List queryForList(String sqlRequest, Object[] parameters, RowMapper rowMapper)
-            throws EmptyResultException, DaoException {
-        List<Object> mappedObjectsList = new ArrayList<>();//TODO CHECK IT ONCE AGAIN
-
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection();
              PreparedStatement statement = connection.prepareStatement(sqlRequest)) {
 
             ResultSet resultSet = buildStatement(statement, parameters).executeQuery();
             return mappingRows(resultSet, rowMapper);
         } catch (InterruptedException | SQLException e) {
-            e.printStackTrace();//TODO delete
-            throw new DaoException("Failed to load objects from result set", e);
+            throw new DaoException(FAILED_TO_LOAD_MSG, e);
         }
     }
 
@@ -153,23 +136,42 @@ public class JdbcHelper {
      *                   RowMapper} for assembling an entity from a single line
      *                   from {@link ResultSet ResultSet}
      * @return {@link ArrayList ArrayList} filled with entities from ResultSet
-     * @throws EmptyResultException
-     * @throws DaoException
+     * @throws DaoException if failed to execute any stage
      */
-    public Object queryForObject(String sqlRequest, Object[] parameters, RowMapper rowMapper)
-            throws EmptyResultException, DaoException {
+    public Optional queryForObject(String sqlRequest, Object[] parameters, RowMapper rowMapper)
+            throws DaoException {
         try (Connection connection = connectionPool.getConnection();
              PreparedStatement statement = connection.prepareStatement(sqlRequest)) {
             ResultSet resultSet = buildStatement(statement, parameters).executeQuery();
 
-            if (resultSet.next()) {
-                return rowMapper.mapRow(resultSet);
-            } else {
-                throw new EmptyResultException("No matches in data base...");
-            }
-
+            return resultSet.next() ? Optional.of(rowMapper.mapRow(resultSet)) : Optional.empty();
         } catch (InterruptedException | SQLException e) {
-            throw new DaoException("Failed to load object from result set", e);
+            throw new DaoException(FAILED_TO_LOAD_MSG, e);
+        }
+    }
+
+    /**
+     * Method for making SELECT requests to util expecting to get a set of
+     * entities in result
+     *
+     * @param sqlRequest string containing request to util without parameters
+     *                   taken from gin entity
+     * @return {@link ArrayList ArrayList} filled with entities from ResultSet
+     * @throws EmptyResultException if nothing was found
+     * @throws DaoException         if failed to execute any stage
+     */
+    public int queryForInt(String sqlRequest) throws DaoException, EmptyResultException {
+        try (Connection connection = connectionPool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sqlRequest)) {
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            } else {
+                throw new EmptyResultException(EMPTY_RESULT_MSG);
+            }
+        } catch (InterruptedException | SQLException e) {
+            throw new DaoException(FAILED_QUERY_MSG, e);
         }
     }
 
@@ -181,15 +183,12 @@ public class JdbcHelper {
      * @param rowMapper a certain implementation of RowMapper for extracting
      *                  entities from ResultSet
      * @return ArrayList filled with entities
-     * @throws EmptyResultException
-     * @throws DaoException
+     * @throws SQLException if sudden fault has happened
      */
     private List mappingRows(ResultSet resultSet, RowMapper rowMapper)
-            throws EmptyResultException, SQLException {
+            throws SQLException {
 
-        if (!resultSet.next()) {
-            throw new EmptyResultException("No matches in data base...");
-        } else {
+        if (resultSet.next()) {
             List<Object> mappedObjectsList = new ArrayList<>();
             mappedObjectsList.add(rowMapper.mapRow(resultSet));
 
@@ -197,6 +196,8 @@ public class JdbcHelper {
                 mappedObjectsList.add(rowMapper.mapRow(resultSet));
             }
             return mappedObjectsList;
+        } else {
+            return Collections.emptyList();
         }
     }
 
@@ -209,17 +210,16 @@ public class JdbcHelper {
      * @param parameters array that contains parameters for statement with appropriate
      *                   order
      * @return filled PreparedStatement
-     * @throws SQLException
-     * @throws DaoException
+     * @throws SQLException if failed to build statement
      */
     private PreparedStatement buildStatement(PreparedStatement statement, Object[] parameters)
             throws SQLException {
         for (int i = 0; i < parameters.length; i++) {
-//            statement.setString(i+1, (String) parameters[i]);
             if (parameters[i] instanceof Number) {
                 statement.setString(i + 1, String.valueOf(parameters[i]));
-            } else if (parameters[i] instanceof LocalDateTime) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            } else
+                if (parameters[i] instanceof LocalDateTime) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIME_PATTERN);
                 String formattedString = ((LocalDateTime) parameters[i]).format(formatter);
                 statement.setString(i + 1, formattedString);
             } else {
@@ -229,11 +229,11 @@ public class JdbcHelper {
         return statement;
     }
 
-    private void rollback(Connection connection) throws DaoException{
-        try{
+    private void rollback(Connection connection) throws DaoException {
+        try {
             connection.rollback();
-        }catch (SQLException e){
-            throw new DaoException("Failed to roll back", e);
+        } catch (SQLException e) {
+            throw new DaoException(FAILED_TO_ROLL_BACK_MSG, e);
         }
     }
 }

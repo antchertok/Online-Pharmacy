@@ -1,12 +1,12 @@
-package main.java.by.chertok.pharmacy.dao;
+package by.chertok.pharmacy.dao;
 
-
-import main.java.by.chertok.pharmacy.entity.User;
-import main.java.by.chertok.pharmacy.exception.DaoException;
+import by.chertok.pharmacy.entity.User;
+import by.chertok.pharmacy.exception.DaoException;
 
 import java.util.Optional;
 
 public interface UserDao extends Dao<User> {
+
     /**
      * Returns {@link Optional Optional} which may contain user object if it
      * was found
@@ -15,5 +15,17 @@ public interface UserDao extends Dao<User> {
      * @param userPassword user's password for search
      * @return Optional with user object if it was found
      */
-    Optional<User> readByLoginPassword(String userLogin, String userPassword) throws DaoException;
+    Optional<User> readByLoginPassword(String userLogin, String userPassword)
+            throws DaoException;
+
+    /**
+     * Returns {@link Optional Optional} which may contain doctor if it
+     * was found
+     *
+     * @param firstName doctor's first name
+     * @param lastName  doctor's last name
+     * @return Optional with user object if it was found
+     */
+    Optional<User> getDocByName(String firstName, String lastName)
+            throws DaoException;
 }

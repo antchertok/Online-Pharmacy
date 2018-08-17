@@ -1,4 +1,4 @@
-package main.java.by.chertok.pharmacy.entity;
+package by.chertok.pharmacy.entity;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -9,7 +9,7 @@ public class Order extends BaseEntity {
     private LocalDateTime orderDate;
     private long pharmacistId;
     private long customerId;
-    private Map<Long, Integer> drugs;//TODO ANALYZE THAT
+    private Map<Long, Integer> drugs;
 
     public Order(long id) {
         super(id);

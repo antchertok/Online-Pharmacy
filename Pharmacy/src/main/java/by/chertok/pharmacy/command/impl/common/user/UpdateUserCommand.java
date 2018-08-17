@@ -1,16 +1,18 @@
-package main.java.by.chertok.pharmacy.command.impl.common.user;
+package by.chertok.pharmacy.command.impl.common.user;
 
-import main.java.by.chertok.pharmacy.command.ICommand;
-import main.java.by.chertok.pharmacy.command.Pages;
-import main.java.by.chertok.pharmacy.entity.User;
-import main.java.by.chertok.pharmacy.exception.ServiceException;
-import main.java.by.chertok.pharmacy.service.UserService;
-import main.java.by.chertok.pharmacy.util.road.Path;
-import main.java.by.chertok.pharmacy.util.wrapper.Wrapper;
+import by.chertok.pharmacy.command.resources.AttributeName;
+import by.chertok.pharmacy.command.ICommand;
+import by.chertok.pharmacy.command.resources.PageStorage;
+import by.chertok.pharmacy.entity.User;
+import by.chertok.pharmacy.exception.ServiceException;
+import by.chertok.pharmacy.service.UserService;
+import by.chertok.pharmacy.util.path.Path;
+import by.chertok.pharmacy.util.wrapper.Wrapper;
 import org.apache.log4j.Logger;
 
 public class UpdateUserCommand implements ICommand {
     private static final Logger LOGGER = Logger.getLogger(UpdateUserCommand.class);
+    private static final String FAIL = "Failed to update profile";
     private UserService userService;
 
     public UpdateUserCommand(UserService userService) {
@@ -27,29 +29,26 @@ public class UpdateUserCommand implements ICommand {
      */
     @Override
     public Path execute(Wrapper wrapper) {
-        try{
-            User user = new User(Integer.parseInt(wrapper.getRequestParameter("id")));
-            user.setLogin(wrapper.getRequestParameter("login").trim());
-            user.setPassword(((User)wrapper.getSessionAttribute("user")).getPassword());
-            user.setFirstName(wrapper.getRequestParameter("firstName").trim());
-            user.setLastName(wrapper.getRequestParameter("lastName").trim());
-            user.setMail(wrapper.getRequestParameter("email").trim());
+        try {
+            User user = (User) wrapper.getSessionAttribute(AttributeName.USER);
+            user.setLogin(wrapper.getRequestParameter(AttributeName.LOGIN).trim());
+            user.setFirstName(wrapper.getRequestParameter(AttributeName.FIRST_NAME).trim());
+            user.setLastName(wrapper.getRequestParameter(AttributeName.LAST_NAME).trim());
+            user.setMail(wrapper.getRequestParameter(AttributeName.EMAIL).trim());
             Path path = new Path();
-            path.setUrl(Pages.START_PAGE);
+            path.setUrl(PageStorage.PROFILE);
 
             if (userService.update(user)) {
-//            request.getRequestDispatcher("index.jsp").forward(request, response);
                 path.setForward(false);
             } else {
-                wrapper.setSessionAttribute("updateInfoMsg", "Failed to update profile");
+                wrapper.setSessionAttribute(AttributeName.UPDATE_INFO_MSG, FAIL);
                 path.setForward(true);
             }
-
             return path;
-        } catch(ServiceException e){
+        } catch (ServiceException e) {
             LOGGER.error(e.getMessage());
-            wrapper.setSessionAttribute("errMsg", e.getMessage());
-            return new Path(false, Pages.ERROR);
+            wrapper.setSessionAttribute(AttributeName.ERROR_MSG, e.getMessage());
+            return new Path(false, PageStorage.ERROR);
         }
     }
 }

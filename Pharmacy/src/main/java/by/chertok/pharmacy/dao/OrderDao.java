@@ -1,7 +1,7 @@
-package main.java.by.chertok.pharmacy.dao;
+package by.chertok.pharmacy.dao;
 
-import main.java.by.chertok.pharmacy.entity.Order;
-import main.java.by.chertok.pharmacy.exception.DaoException;
+import by.chertok.pharmacy.entity.Order;
+import by.chertok.pharmacy.exception.DaoException;
 
 import java.util.List;
 import java.util.Map;

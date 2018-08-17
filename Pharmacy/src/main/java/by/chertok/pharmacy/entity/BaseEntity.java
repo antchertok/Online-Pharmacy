@@ -1,4 +1,4 @@
-package main.java.by.chertok.pharmacy.entity;
+package by.chertok.pharmacy.entity;
 
 /**
  * Root class setting basic properties for entities

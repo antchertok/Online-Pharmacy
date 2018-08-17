@@ -1,22 +1,25 @@
-package main.java.by.chertok.pharmacy.command.impl.customer;
+package by.chertok.pharmacy.command.impl.customer;
 
-import main.java.by.chertok.pharmacy.command.ICommand;
-import main.java.by.chertok.pharmacy.command.Pages;
-import main.java.by.chertok.pharmacy.entity.Order;
-import main.java.by.chertok.pharmacy.entity.User;
-import main.java.by.chertok.pharmacy.exception.ServiceException;
-import main.java.by.chertok.pharmacy.service.OrderService;
-import main.java.by.chertok.pharmacy.util.road.Path;
-import main.java.by.chertok.pharmacy.util.wrapper.Wrapper;
+import by.chertok.pharmacy.command.resources.AttributeName;
+import by.chertok.pharmacy.command.ICommand;
+import by.chertok.pharmacy.command.resources.PageStorage;
+import by.chertok.pharmacy.entity.Order;
+import by.chertok.pharmacy.entity.User;
+import by.chertok.pharmacy.exception.ServiceException;
+import by.chertok.pharmacy.service.OrderService;
+import by.chertok.pharmacy.util.path.Path;
+import by.chertok.pharmacy.util.wrapper.Wrapper;
 import org.apache.log4j.Logger;
 
 import java.time.LocalDateTime;
 
 public class ApproveOrderCommand implements ICommand {
     private static final Logger LOGGER = Logger.getLogger(ApproveOrderCommand.class);
+    private static final String SUCCESS = "Success";
+    private static final String FAIL = "Failed to make order";
     private OrderService orderService;
 
-    public ApproveOrderCommand(OrderService orderService){
+    public ApproveOrderCommand(OrderService orderService) {
         this.orderService = orderService;
     }
 
@@ -31,30 +34,30 @@ public class ApproveOrderCommand implements ICommand {
      */
     @Override
     public Path execute(Wrapper wrapper) {
-        try{
-            Order order = (Order)wrapper.getSessionAttribute("order");
+        try {
+            Order order = (Order) wrapper.getSessionAttribute(AttributeName.ORDER);
             order.setOrderDate(LocalDateTime.now());
             Path path = new Path();
-            path.setUrl(Pages.PROFILE);
+            path.setUrl(wrapper.getRequestParameter(AttributeName.CURRENT_URL));
 
-            if(orderService.create(order)){
-                wrapper.setRequestAttribute("infoOrder", "Success");
+            if (orderService.create(order)) {
+                wrapper.setRequestAttribute(AttributeName.INFO_ORDER, SUCCESS);
                 order = new Order(0);
-                order.setCustomerId(((User)wrapper.getSessionAttribute("user")).getId());
-                wrapper.setSessionAttribute("order", order);
-                wrapper.setSessionAttribute("drugsOrdered", 0);
-                wrapper.setSessionAttribute("total", 0.0);
+                order.setCustomerId(((User) wrapper.getSessionAttribute(AttributeName.USER)).getId());
+                wrapper.setSessionAttribute(AttributeName.ORDER, order);
+                wrapper.setSessionAttribute(AttributeName.DRUGS_ORDERED, 0);
+                wrapper.setSessionAttribute(AttributeName.TOTAL, 0.0);
                 path.setForward(false);
                 return path;
             } else {
-                wrapper.setRequestAttribute("infoOrder", "Failure");
+                wrapper.setRequestAttribute(AttributeName.INFO_ORDER, FAIL);
                 path.setForward(true);
                 return path;
             }
-        } catch(ServiceException e){
+        } catch (ServiceException e) {
             LOGGER.error(e.getMessage());
-            wrapper.setSessionAttribute("errMsg", e.getMessage());
-            return new Path(false, Pages.ERROR);
+            wrapper.setSessionAttribute(AttributeName.ERROR_MSG, e.getMessage());
+            return new Path(false, PageStorage.ERROR);
         }
     }
 }

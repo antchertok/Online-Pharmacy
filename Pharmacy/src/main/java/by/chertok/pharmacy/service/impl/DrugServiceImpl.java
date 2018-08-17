@@ -1,21 +1,23 @@
-package main.java.by.chertok.pharmacy.service.impl;
+package by.chertok.pharmacy.service.impl;
 
-import main.java.by.chertok.pharmacy.dao.DrugDao;
-import main.java.by.chertok.pharmacy.entity.Drug;
-import main.java.by.chertok.pharmacy.exception.DaoException;
-import main.java.by.chertok.pharmacy.exception.EmptyResultException;
-import main.java.by.chertok.pharmacy.exception.ServiceException;
-import main.java.by.chertok.pharmacy.service.DrugService;
+import by.chertok.pharmacy.dao.DrugDao;
+import by.chertok.pharmacy.entity.Drug;
+import by.chertok.pharmacy.exception.DaoException;
+import by.chertok.pharmacy.exception.ServiceException;
+import by.chertok.pharmacy.service.DrugService;
 import org.apache.log4j.Logger;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 public class DrugServiceImpl implements DrugService {
 
     private static final Logger LOGGER = Logger.getLogger(DrugServiceImpl.class);
-    private static final String ERR_MSG = "Operation failed";
+    private static final String GETTING_DRUG_ERR_MSG = "Failed to get drug";
+    private static final String CREATING_DRUG_ERR_MSG = "Failed to create new drug";
+    private static final String UPDATING_DRUG_ERR_MSG = "Failed to update drug";
+    private static final String DELETING_DRUG_ERR_MSG = "Failed to delete drug";
+    private static final String COUNTING_DRUGS_ERR_MSG = "Failed to count records";
     private DrugDao drugDao;
 
     public DrugServiceImpl(DrugDao drugDao) {
@@ -24,96 +26,72 @@ public class DrugServiceImpl implements DrugService {
 
     @Override
     public List<Drug> readAll() throws ServiceException {
-        try{
+        try {
             return drugDao.readAll();
-        } catch(DaoException e){//TODO запилить processDaoException(logger, throwable) throws ServiceException
+        } catch (DaoException e) {
             LOGGER.error(e.getMessage());
-            if(e.getCause() instanceof EmptyResultException){
-                return Collections.EMPTY_LIST;
-            }
-            throw new ServiceException(ERR_MSG);
+            throw new ServiceException(GETTING_DRUG_ERR_MSG, e);
         }
     }
 
     @Override
-    public Optional<Drug> readById(long id) throws ServiceException{
+    public Optional<Drug> readById(long id) throws ServiceException {
         try {
             return drugDao.readById(id);
-        } catch(DaoException e){
+        } catch (DaoException e) {
             LOGGER.error(e.getMessage());
-            if(e.getCause() instanceof EmptyResultException){
-                return Optional.empty();
-            }
-            throw new ServiceException(ERR_MSG);
+            throw new ServiceException(GETTING_DRUG_ERR_MSG, e);
         }
     }
 
     @Override
-    public boolean create(Drug entity) throws ServiceException{
-        try{
+    public boolean create(Drug entity) throws ServiceException {
+        try {
             return drugDao.create(entity) > 0;
-        } catch(DaoException e){
+        } catch (DaoException e) {
             LOGGER.error(e.getMessage());
-            throw new ServiceException(ERR_MSG);
+            throw new ServiceException(CREATING_DRUG_ERR_MSG, e);
         }
-
     }
 
     @Override
-    public boolean update(Drug entity) throws ServiceException{
-        try{
+    public boolean update(Drug entity) throws ServiceException {
+        try {
             return drugDao.update(entity) > 0;
-        } catch(DaoException e){
+        } catch (DaoException e) {
             LOGGER.error(e.getMessage());
-            throw new ServiceException(ERR_MSG);
+            throw new ServiceException(UPDATING_DRUG_ERR_MSG, e);
         }
-
     }
 
     @Override
-    public boolean delete(long id) throws ServiceException{
-        try{
+    public boolean delete(long id) throws ServiceException {
+        try {
             return drugDao.delete(id) > 0;
-        } catch(DaoException e){
+        } catch (DaoException e) {
             LOGGER.error(e.getMessage());
-            throw new ServiceException(ERR_MSG);
-        }
-
-    }
-
-    @Override
-    public List<Drug> readByName(String drugName) throws ServiceException{
-        try{
-            return drugDao.readByName(drugName);
-        } catch(DaoException e){
-            LOGGER.error(e.getMessage());
-            if(e.getCause() instanceof EmptyResultException){
-                return Collections.EMPTY_LIST;
-            }
-            throw new ServiceException(ERR_MSG);
+            throw new ServiceException(DELETING_DRUG_ERR_MSG, e);
         }
     }
 
     @Override
-    public List<Drug> readForPage(String drugName, int pageNumber, int elements) throws ServiceException{
-        try{
+    public List<Drug> readForPage(String drugName, int pageNumber, int elements)
+            throws ServiceException {
+        try {
             return drugDao.readForPage(drugName, pageNumber, elements);
         } catch (DaoException e) {
             LOGGER.error(e.getMessage(), e);
-            if(e.getCause() instanceof EmptyResultException){
-                return Collections.EMPTY_LIST;
-            }
-            throw new ServiceException(ERR_MSG);
+            throw new ServiceException(GETTING_DRUG_ERR_MSG, e);
         }
     }
 
     @Override
-    public int getAmountOfRecords(String name) throws ServiceException{
-        try{
+    public int getAmountOfRecords(String name) throws ServiceException {
+        try {
             return drugDao.getAmountOfRecords(name);
-        }catch (DaoException e){
-            LOGGER.error(e);
-            throw new ServiceException("Records were not counted", e);
+        } catch (DaoException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new ServiceException(COUNTING_DRUGS_ERR_MSG, e);
         }
     }
 }

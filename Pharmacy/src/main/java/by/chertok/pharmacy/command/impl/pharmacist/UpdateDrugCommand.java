@@ -1,16 +1,18 @@
-package main.java.by.chertok.pharmacy.command.impl.pharmacist;
-;
-import main.java.by.chertok.pharmacy.command.ICommand;
-import main.java.by.chertok.pharmacy.command.Pages;
-import main.java.by.chertok.pharmacy.entity.Drug;
-import main.java.by.chertok.pharmacy.exception.ServiceException;
-import main.java.by.chertok.pharmacy.service.DrugService;
-import main.java.by.chertok.pharmacy.util.road.Path;
-import main.java.by.chertok.pharmacy.util.wrapper.Wrapper;
+package by.chertok.pharmacy.command.impl.pharmacist;
+
+import by.chertok.pharmacy.command.resources.AttributeName;
+import by.chertok.pharmacy.command.ICommand;
+import by.chertok.pharmacy.command.resources.PageStorage;
+import by.chertok.pharmacy.entity.Drug;
+import by.chertok.pharmacy.exception.ServiceException;
+import by.chertok.pharmacy.service.DrugService;
+import by.chertok.pharmacy.util.path.Path;
+import by.chertok.pharmacy.util.wrapper.Wrapper;
 import org.apache.log4j.Logger;
 
 public class UpdateDrugCommand implements ICommand {
     private static final Logger LOGGER = Logger.getLogger(UpdateDrugCommand.class);
+    private static final String FAIL = "Failed to update drug";
     private DrugService drugService;
 
     public UpdateDrugCommand(DrugService drugService) {
@@ -28,29 +30,28 @@ public class UpdateDrugCommand implements ICommand {
     @Override
     public Path execute(Wrapper wrapper) {
         try{
-            Drug drug = new Drug(Long.parseLong(wrapper.getRequestParameter("drugId")));
+            Drug drug = new Drug(Long.parseLong(wrapper.getRequestParameter(AttributeName.DRUG_ID)));
 
-            drug.setName(wrapper.getRequestParameter("name"));
-            drug.setDose(Integer.parseInt(wrapper.getRequestParameter("dose")));
-            drug.setPrice(Double.parseDouble(wrapper.getRequestParameter("price")));
-            drug.setPrescription(Integer.parseInt(wrapper.getRequestParameter("prescription")));
+            drug.setName(wrapper.getRequestParameter(AttributeName.NAME));
+            drug.setDose(Integer.parseInt(wrapper.getRequestParameter(AttributeName.DOSE)));
+            drug.setPrice(Double.parseDouble(wrapper.getRequestParameter(AttributeName.PRICE)));
+            drug.setPrescription(Integer.parseInt(wrapper.getRequestParameter(AttributeName.PRESCRIPTION)));
             Path path = new Path();
-            path.setUrl(Pages.ALTERNATING_DRUGS);
 
             if (drugService.update(drug)) {
-                wrapper.setRequestAttribute("infoMsg", "Drug updated successfully.");
+                path.setUrl(PageStorage.START_PAGE);
                 path.setForward(false);
             } else {
-                wrapper.setRequestAttribute("infoMsg", "Failed to update drug.");
-//                request.getRequestDispatcher("alteringDrugPage.jsp").forward(request, response);
+                wrapper.setRequestAttribute(AttributeName.INFO_MSG, FAIL);
+                path.setUrl(PageStorage.ALTERNATING_DRUGS);
                 path.setForward(true);
             }
 
             return path;
         } catch(ServiceException e){
             LOGGER.error(e.getMessage());
-            wrapper.setSessionAttribute("errMsg", e.getMessage());
-            return new Path(false, Pages.ERROR);
+            wrapper.setSessionAttribute(AttributeName.ERROR_MSG, e.getMessage());
+            return new Path(false, PageStorage.ERROR);
         }
     }
 }

@@ -1,6 +1,6 @@
-package main.java.by.chertok.pharmacy.util.md5.impl;
+package by.chertok.pharmacy.util.encoder.impl;
 
-import main.java.by.chertok.pharmacy.util.md5.Encoder;
+import by.chertok.pharmacy.util.encoder.Encoder;
 import org.apache.commons.codec.digest.DigestUtils;
 
 /**
@@ -9,7 +9,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 public class EncoderMd5 implements Encoder {
 
     @Override
-    public String encode(String text){
+    public String encode(String text) {
         return DigestUtils.md5Hex(text);
     }
 }

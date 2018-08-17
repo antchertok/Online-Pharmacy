@@ -1,35 +1,28 @@
-package main.java.by.chertok.pharmacy.instance;
+package by.chertok.pharmacy.instance;
 
-import main.java.by.chertok.pharmacy.dao.*;
-import main.java.by.chertok.pharmacy.dao.impl.*;
-import main.java.by.chertok.pharmacy.dao.util.JdbcHelper;
-import main.java.by.chertok.pharmacy.pool.ConnectionPool;
+import by.chertok.pharmacy.dao.*;
+import by.chertok.pharmacy.dao.impl.*;
+import by.chertok.pharmacy.dao.util.JdbcHelper;
+import by.chertok.pharmacy.pool.ConnectionPool;
 
 /**
  * Auxiliary class providing access to all kinds of DAO
  */
-public class DaoInstance {
+public class DaoKeeper {
     private UserDao userDao;
     private DrugDao drugDao;
     private OrderDao orderDao;
     private PrescriptionDao prescriptionDao;
 
-    private DaoInstance(JdbcHelper jdbcHelper){
+    private DaoKeeper(JdbcHelper jdbcHelper){
         userDao = new UserDaoImpl(jdbcHelper);
         drugDao = new DrugDaoImpl(jdbcHelper);
         orderDao = new OrderDaoImpl(jdbcHelper);
         prescriptionDao = new PrescriptionDaoImpl(jdbcHelper);
     }
 
-    public static synchronized DaoInstance getInstance() {
-        if (DaoInstanceHolder.INSTANCE == null) {
-            initDaoInstance(new JdbcHelper(ConnectionPool.getInstance()));
-        }
+    public static DaoKeeper getInstance() {
         return DaoInstanceHolder.INSTANCE;
-    }
-
-    public static synchronized void initDaoInstance(JdbcHelper jdbcHelper) {
-        DaoInstanceHolder.INSTANCE = new DaoInstance(jdbcHelper);
     }
 
     public UserDao getUserDao() {
@@ -49,6 +42,6 @@ public class DaoInstance {
     }
 
     private static class DaoInstanceHolder {
-        private static DaoInstance INSTANCE;
+        private static final DaoKeeper INSTANCE = new DaoKeeper(new JdbcHelper(ConnectionPool.getInstance()));
     }
 }

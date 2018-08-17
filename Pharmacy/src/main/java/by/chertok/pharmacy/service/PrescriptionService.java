@@ -1,7 +1,7 @@
-package main.java.by.chertok.pharmacy.service;
+package by.chertok.pharmacy.service;
 
-import main.java.by.chertok.pharmacy.entity.Prescription;
-import main.java.by.chertok.pharmacy.exception.ServiceException;
+import by.chertok.pharmacy.entity.Prescription;
+import by.chertok.pharmacy.exception.ServiceException;
 
 import java.util.List;
 
@@ -15,5 +15,12 @@ public interface PrescriptionService extends Service<Prescription> {
      * @return true if the prescription exists and is approved
      */
     boolean checkAvailability(long drugId, long customerId) throws ServiceException;
+
+    /**
+     * Gets all prescriptions addressed to given doctor from data storage
+     *
+     * @param doctorId doctor, whose prescriptions are to be given
+     * @return List with prescriptions addressed to doctor with given id
+     */
     List<Prescription> readByDoctorId(long doctorId) throws ServiceException;
 }

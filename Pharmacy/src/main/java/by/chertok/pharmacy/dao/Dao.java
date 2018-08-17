@@ -1,6 +1,6 @@
-package main.java.by.chertok.pharmacy.dao;
+package by.chertok.pharmacy.dao;
 
-import main.java.by.chertok.pharmacy.exception.DaoException;
+import by.chertok.pharmacy.exception.DaoException;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +11,7 @@ import java.util.Optional;
  * @param <T> type of entity used in specific DAO
  */
 public interface Dao<T> {//для прескрипшн:
+
     /**
      * Takes all entities with given type from util
      *
@@ -23,7 +24,7 @@ public interface Dao<T> {//для прескрипшн:
      *
      * @param id unique entity identifier
      * @return {@link Optional Optional} which can contain an entity
-    */
+     */
     Optional<T> readById(long id) throws DaoException;
 
     /**

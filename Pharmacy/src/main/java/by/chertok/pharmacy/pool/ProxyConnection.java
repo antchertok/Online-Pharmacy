@@ -1,4 +1,4 @@
-package main.java.by.chertok.pharmacy.pool;
+package by.chertok.pharmacy.pool;
 
 import java.sql.*;
 import java.util.Map;

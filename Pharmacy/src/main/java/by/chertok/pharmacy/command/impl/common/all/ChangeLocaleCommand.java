@@ -1,8 +1,9 @@
-package main.java.by.chertok.pharmacy.command.impl.common.all;
+package by.chertok.pharmacy.command.impl.common.all;
 
-import main.java.by.chertok.pharmacy.command.ICommand;
-import main.java.by.chertok.pharmacy.util.road.Path;
-import main.java.by.chertok.pharmacy.util.wrapper.Wrapper;
+import by.chertok.pharmacy.command.resources.AttributeName;
+import by.chertok.pharmacy.command.ICommand;
+import by.chertok.pharmacy.util.path.Path;
+import by.chertok.pharmacy.util.wrapper.Wrapper;
 
 public class ChangeLocaleCommand implements ICommand {
 
@@ -17,8 +18,8 @@ public class ChangeLocaleCommand implements ICommand {
      */
     @Override
     public Path execute(Wrapper wrapper) {
-        String locale = wrapper.getRequestParameter("locale");
-        wrapper.setSessionAttribute("locale", locale);
-        return new Path(true, wrapper.getRequestParameter("currentUrl"));
+        String locale = wrapper.getRequestParameter(AttributeName.LOCALE);
+        wrapper.setSessionAttribute(AttributeName.LOCALE, locale);
+        return new Path(true, wrapper.getRequestParameter(AttributeName.CURRENT_URL));
     }
 }

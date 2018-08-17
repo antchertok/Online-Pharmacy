@@ -1,6 +1,6 @@
-package main.java.by.chertok.pharmacy.service;
+package by.chertok.pharmacy.service;
 
-import main.java.by.chertok.pharmacy.exception.ServiceException;
+import by.chertok.pharmacy.exception.ServiceException;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +46,7 @@ public interface Service<T> {
      * Removes an entity with a specified id from data storage
      *
      * @param id unique identifier of the entity for removing
-     * @return
+     * @return true if deleting was successful
      */
     boolean delete(long id) throws ServiceException;
 }

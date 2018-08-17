@@ -1,19 +1,21 @@
-package main.java.by.chertok.pharmacy.command.impl.customer;
+package by.chertok.pharmacy.command.impl.customer;
 
-import main.java.by.chertok.pharmacy.command.ICommand;
-import main.java.by.chertok.pharmacy.command.Pages;
-import main.java.by.chertok.pharmacy.entity.Order;
-import main.java.by.chertok.pharmacy.entity.User;
-import main.java.by.chertok.pharmacy.exception.ServiceException;
-import main.java.by.chertok.pharmacy.service.OrderService;
-import main.java.by.chertok.pharmacy.util.road.Path;
-import main.java.by.chertok.pharmacy.util.wrapper.Wrapper;
+import by.chertok.pharmacy.command.resources.AttributeName;
+import by.chertok.pharmacy.command.ICommand;
+import by.chertok.pharmacy.command.resources.PageStorage;
+import by.chertok.pharmacy.entity.Order;
+import by.chertok.pharmacy.entity.User;
+import by.chertok.pharmacy.exception.ServiceException;
+import by.chertok.pharmacy.service.OrderService;
+import by.chertok.pharmacy.util.path.Path;
+import by.chertok.pharmacy.util.wrapper.Wrapper;
 import org.apache.log4j.Logger;
 
 import java.util.List;
 
 public class ListOrderCommand implements ICommand {
     private static final Logger LOGGER = Logger.getLogger(ListOrderCommand.class);
+    private static final String FAIL = "Nothing was found";
     private OrderService orderService;
 
     public ListOrderCommand(OrderService orderService) {
@@ -31,20 +33,19 @@ public class ListOrderCommand implements ICommand {
     @Override
     public Path execute(Wrapper wrapper) {
         try{
-            long userId = ((User) wrapper.getSessionAttribute("user")).getId();
+            long userId = ((User) wrapper.getSessionAttribute(AttributeName.USER)).getId();
             List<Order> orders = orderService.readByUserId(userId);
 
             if (!orders.isEmpty()) {
-//            request.setAttribute("orders", orders);
-                wrapper.setRequestAttribute("orders", orders);
+                wrapper.setRequestAttribute(AttributeName.ORDERS, orders);
             } else {
-                wrapper.setRequestAttribute("errorMsg", "Nothing was found");
+                wrapper.setRequestAttribute(AttributeName.NO_ORDER_MSG, FAIL);
             }
-            return new Path(true, Pages.PROFILE);
+            return new Path(true, PageStorage.PROFILE);
         } catch(ServiceException e){
             LOGGER.error(e.getMessage());
-            wrapper.setSessionAttribute("errMsg", e.getMessage());
-            return new Path(false, Pages.ERROR);
+            wrapper.setSessionAttribute(AttributeName.ERROR_MSG, e.getMessage());
+            return new Path(false, PageStorage.ERROR);
         }
     }
 }

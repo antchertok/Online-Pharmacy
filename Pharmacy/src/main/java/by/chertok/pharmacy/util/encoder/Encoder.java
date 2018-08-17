@@ -1,4 +1,4 @@
-package main.java.by.chertok.pharmacy.util.md5;
+package by.chertok.pharmacy.util.encoder;
 
 /**
  * Interface for text encoders

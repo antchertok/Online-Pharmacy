@@ -1,4 +1,4 @@
-package main.java.by.chertok.pharmacy.dao.util;
+package by.chertok.pharmacy.dao.util;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

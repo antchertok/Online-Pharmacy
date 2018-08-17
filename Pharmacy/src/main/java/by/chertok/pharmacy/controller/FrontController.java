@@ -1,10 +1,9 @@
-package main.java.by.chertok.pharmacy.controller;
+package by.chertok.pharmacy.controller;
 
-
-import main.java.by.chertok.pharmacy.command.CommandProvider;
-import main.java.by.chertok.pharmacy.command.ICommand;
-import main.java.by.chertok.pharmacy.util.road.Path;
-import main.java.by.chertok.pharmacy.util.wrapper.Wrapper;
+import by.chertok.pharmacy.command.CommandProvider;
+import by.chertok.pharmacy.command.ICommand;
+import by.chertok.pharmacy.util.path.Path;
+import by.chertok.pharmacy.util.wrapper.Wrapper;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -13,7 +12,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
 
 /**
  * Servlet representing application controller
@@ -37,10 +35,11 @@ public class FrontController extends HttpServlet {
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println(request.getContextPath());
+
         Wrapper wrapper = new Wrapper();
         wrapper.extract(request);
-        ICommand command = CommandProvider.getCommandByName(wrapper.getRequestParameter("command"));
+        CommandProvider provider = new CommandProvider();
+        ICommand command = provider.getCommandByName(wrapper.getRequestParameter("command"));
         Path path = command.execute(wrapper);
         wrapper.updateRequest(request);
 

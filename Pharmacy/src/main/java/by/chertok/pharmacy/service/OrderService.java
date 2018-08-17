@@ -1,7 +1,7 @@
-package main.java.by.chertok.pharmacy.service;
+package by.chertok.pharmacy.service;
 
-import main.java.by.chertok.pharmacy.entity.Order;
-import main.java.by.chertok.pharmacy.exception.ServiceException;
+import by.chertok.pharmacy.entity.Order;
+import by.chertok.pharmacy.exception.ServiceException;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package main.java.by.chertok.pharmacy.exception;
+package by.chertok.pharmacy.exception;
 
 public class EmptyResultException extends Exception {
     public EmptyResultException() {

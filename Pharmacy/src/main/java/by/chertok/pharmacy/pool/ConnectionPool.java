@@ -1,7 +1,7 @@
-package main.java.by.chertok.pharmacy.pool;
+package by.chertok.pharmacy.pool;
 
-import main.java.by.chertok.pharmacy.exception.ConnectionPoolException;
-import main.java.by.chertok.pharmacy.manager.ResourceManager;
+import by.chertok.pharmacy.exception.ConnectionPoolException;
+import by.chertok.pharmacy.manager.DatabaseResourceManager;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
@@ -10,9 +10,17 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class ConnectionPool {
-    private static final int DEFAULT_POOL_SIZE = 5;
+    private static volatile ConnectionPool instance;
     private static final Logger LOGGER = Logger.getLogger(ConnectionPool.class);
-    private BlockingQueue<ProxyConnection> connections;
+    private static final String USER_KEY = "db.user";
+    private static final String PASSWORD_KEY = "db.password";
+    private static final String URL_KEY = "db.url";
+    private static final String DRIVER_KEY = "db.driver";
+    private static final String POOL_SIZE_KEY = "db.poolSize";
+    private static final String INITIALIZING_ERROR_MSG = "Failed to initialize connection pool";
+
+    private BlockingQueue<ProxyConnection> availableConnections;
+    private BlockingQueue<ProxyConnection> givenConnections;
 
     private int poolSize;
     private String user;
@@ -21,63 +29,36 @@ public class ConnectionPool {
     private String driverName;
 
     private ConnectionPool() throws ConnectionPoolException {
-        ResourceManager manager = ResourceManager.getInstance();
-        user = manager.getValue("db.user");
-        password = manager.getValue("db.password");
-        url = manager.getValue("db.url");
-        driverName = manager.getValue("db.driver");
+        DatabaseResourceManager manager = DatabaseResourceManager.getInstance();
+        user = manager.getValue(USER_KEY);
+        password = manager.getValue(PASSWORD_KEY);
+        url = manager.getValue(URL_KEY);
+        driverName = manager.getValue(DRIVER_KEY);
+        poolSize = Integer.parseInt(manager.getValue(POOL_SIZE_KEY));
+
         try {
-            poolSize = Integer.parseInt(manager.getValue("db.poolSize"));
-        } catch (NumberFormatException e) {
-            LOGGER.error("Failed to parse pool size. Default value was sat", e);
-            poolSize = DEFAULT_POOL_SIZE;
-        }
-        try {
-            initPool(poolSize);
+            initPool();
         } catch (SQLException | ClassNotFoundException e) {
             LOGGER.error(e);
-            throw new ConnectionPoolException("Failed to initialize connection pool", e);
-        };
+            throw new ConnectionPoolException(INITIALIZING_ERROR_MSG, e);
+        }
     }
 
     /**
      * Launches connection pool initialization
      */
-    public static void poolStart() throws ConnectionPoolException{
-        ConnectionPoolHolder.INSTANCE = new ConnectionPool();
+    public static void poolStart() throws ConnectionPoolException {
+        instance = new ConnectionPool();
     }
 
     public static ConnectionPool getInstance() {
-        return ConnectionPoolHolder.INSTANCE;
+        return instance;
     }
 
     public Connection getConnection() throws InterruptedException {
-        return connections.take();
-    }
-
-    /**
-     * Closes all current connections
-     */
-    public void destroy() {
-        try {
-            for (ProxyConnection connection : connections) {
-                connection.closeConnection();
-            }
-        } catch (SQLException e) {
-            LOGGER.error("Failed to close connection", e);
-        }
-    }
-
-    private void initPool(int poolSize) throws ClassNotFoundException, SQLException {
-        Locale.setDefault(Locale.ENGLISH);
-        Class.forName(driverName);
-
-        connections = new ArrayBlockingQueue<>(poolSize);
-
-        for (int i = 0; i < poolSize; i++) {
-            ProxyConnection proxyConnection = new ProxyConnection(DriverManager.getConnection(url, user, password));
-            connections.offer(proxyConnection);
-        }
+        ProxyConnection connection = availableConnections.take();
+        givenConnections.offer(connection);
+        return connection;
     }
 
     /**
@@ -85,11 +66,37 @@ public class ConnectionPool {
      *
      * @param connection connection for return
      */
-    public void closeConnection(ProxyConnection connection){
-        connections.offer(connection);
+    public void closeConnection(ProxyConnection connection) {
+        availableConnections.offer(connection);
+        givenConnections.remove(connection);
     }
 
-    private static class ConnectionPoolHolder {
-        public static ConnectionPool INSTANCE;
+    /**
+     * Closes all current availableConnections
+     */
+    public void destroy() {
+        try {
+            for (ProxyConnection connection : availableConnections) {
+                connection.closeConnection();
+            }
+            for (ProxyConnection connection : givenConnections) {
+                connection.closeConnection();
+            }
+        } catch (SQLException e) {
+            LOGGER.error(e);
+        }
+    }
+
+    private void initPool() throws ClassNotFoundException, SQLException {
+        Locale.setDefault(Locale.ENGLISH);
+        Class.forName(driverName);
+
+        availableConnections = new ArrayBlockingQueue<>(poolSize);
+        givenConnections = new ArrayBlockingQueue<>(poolSize);
+
+        for (int i = 0; i < poolSize; i++) {
+            ProxyConnection proxyConnection = new ProxyConnection(DriverManager.getConnection(url, user, password));
+            availableConnections.offer(proxyConnection);
+        }
     }
 }

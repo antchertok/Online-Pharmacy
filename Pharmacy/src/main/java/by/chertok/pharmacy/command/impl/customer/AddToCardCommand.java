@@ -1,22 +1,27 @@
-package main.java.by.chertok.pharmacy.command.impl.customer;
+package by.chertok.pharmacy.command.impl.customer;
 
-import main.java.by.chertok.pharmacy.command.ICommand;
-import main.java.by.chertok.pharmacy.command.Pages;
-import main.java.by.chertok.pharmacy.command.impl.pharmacist.AddDrugCommand;
-import main.java.by.chertok.pharmacy.entity.Drug;
-import main.java.by.chertok.pharmacy.entity.Order;
-import main.java.by.chertok.pharmacy.entity.User;
-import main.java.by.chertok.pharmacy.exception.ServiceException;
-import main.java.by.chertok.pharmacy.service.DrugService;
-import main.java.by.chertok.pharmacy.service.PrescriptionService;
-import main.java.by.chertok.pharmacy.util.road.Path;
-import main.java.by.chertok.pharmacy.util.wrapper.Wrapper;
+import by.chertok.pharmacy.command.resources.AttributeName;
+import by.chertok.pharmacy.command.ICommand;
+import by.chertok.pharmacy.command.resources.PageStorage;
+import by.chertok.pharmacy.command.impl.pharmacist.AddDrugCommand;
+import by.chertok.pharmacy.entity.Drug;
+import by.chertok.pharmacy.entity.Order;
+import by.chertok.pharmacy.entity.User;
+import by.chertok.pharmacy.exception.ServiceException;
+import by.chertok.pharmacy.service.DrugService;
+import by.chertok.pharmacy.service.PrescriptionService;
+import by.chertok.pharmacy.util.path.Path;
+import by.chertok.pharmacy.util.wrapper.Wrapper;
 import org.apache.log4j.Logger;
 
 import java.util.Optional;
 
 public class AddToCardCommand implements ICommand {
     private static final Logger LOGGER = Logger.getLogger(AddDrugCommand.class);
+    private static final String SUCCESS = "Success";
+    private static final String NOT_AVAILABLE = "Drug is not available at the moment";
+    private static final String PRICE_PATTERN = "%.2f";
+    private static final String FAILED_TO_ADD = "Failed to add drug";
     private DrugService drugService;
     private PrescriptionService prescriptionService;
 
@@ -37,33 +42,39 @@ public class AddToCardCommand implements ICommand {
     @Override
     public Path execute(Wrapper wrapper) {
         try {
-            Order order = (Order) wrapper.getSessionAttribute("order");
-            long drugId = Long.parseLong(wrapper.getRequestParameter("drugId"));
-            long userId = ((User) wrapper.getSessionAttribute("user")).getId();
-            int amount = Integer.parseInt(wrapper.getRequestParameter("amount"));
-            int drugsOrdered = (Integer) wrapper.getSessionAttribute("drugsOrdered");
-            double total = (Double)wrapper.getSessionAttribute("total");
-            double price = Double.parseDouble(wrapper.getRequestParameter("price"));
+            Order order = (Order) wrapper.getSessionAttribute(AttributeName.ORDER);
+            long drugId = Long.parseLong(wrapper.getRequestParameter(AttributeName.DRUG_ID));
+            long userId = ((User) wrapper.getSessionAttribute(AttributeName.USER)).getId();
+            int amount = Integer.parseInt(wrapper.getRequestParameter(AttributeName.AMOUNT));
+            int drugsOrdered = (Integer) wrapper.getSessionAttribute(AttributeName.DRUGS_ORDERED);
+            double total = (Double) wrapper.getSessionAttribute(AttributeName.TOTAL);
+            double price = Double.parseDouble(wrapper.getRequestParameter(AttributeName.PRICE));
 
             if (isAvailable(drugId, userId)) {
-                order.addDrug(drugId, amount);
-                wrapper.setSessionAttribute("order", order);// TODO: SHOULD I RENEW IT??!!
-                wrapper.setSessionAttribute("drugsOrdered", ++drugsOrdered);
-                wrapper.setSessionAttribute("total", total + price * amount);
-                wrapper.setRequestAttribute("infoCardMsg", "Success");
+                if (order.getDrugs().containsKey(drugId)) {
+                    order.addDrug(drugId, order.getDrugs().get(drugId) + amount);
+                } else {
+                    order.addDrug(drugId, amount);
+                    wrapper.setSessionAttribute(AttributeName.DRUGS_ORDERED, ++drugsOrdered);
+                }
+                wrapper.setSessionAttribute(AttributeName.ORDER, order);
+                wrapper.setSessionAttribute(AttributeName.TOTAL,
+                        Double.parseDouble(String.format(PRICE_PATTERN, total + price * amount)));
+                wrapper.setRequestAttribute(AttributeName.INFO_CART_MSG, SUCCESS);
             } else {
-                wrapper.setRequestAttribute("infoCardMsg", "Drug is not available at the moment");
+                wrapper.setRequestAttribute(AttributeName.INFO_PRESCRIPTION, NOT_AVAILABLE);
+                wrapper.setRequestAttribute(AttributeName.DRUG_ID_FOR_PRESC, drugId);
             }
 
         } catch (NumberFormatException e) {
             LOGGER.error(e);
-            wrapper.setRequestAttribute("infoCardMsg", "Failed to add drug");
-        } catch(ServiceException e){
+            wrapper.setRequestAttribute(AttributeName.INFO_CART_MSG, FAILED_TO_ADD);
+        } catch (ServiceException e) {
             LOGGER.error(e.getMessage());
-            wrapper.setSessionAttribute("errMsg", e.getMessage());
-            return new Path(false, Pages.ERROR);
+            wrapper.setSessionAttribute(AttributeName.ERROR_MSG, e.getMessage());
+            return new Path(false, PageStorage.ERROR);
         }
-        return new Path(true, Pages.START_PAGE);
+        return new Path(true, PageStorage.START_PAGE);
     }
 
     private boolean isAvailable(long drugId, long userId) throws ServiceException {
@@ -71,7 +82,6 @@ public class AddToCardCommand implements ICommand {
         boolean isAvailable = false;
         if (drug.isPresent()) {
             if (drug.get().getPrescription() == 1) {
-                System.out.println(drug);
                 isAvailable = prescriptionService.checkAvailability(drugId, userId);
             } else {
                 isAvailable = true;

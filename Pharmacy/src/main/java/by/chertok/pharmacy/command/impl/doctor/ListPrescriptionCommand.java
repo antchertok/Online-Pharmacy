@@ -1,22 +1,24 @@
-package main.java.by.chertok.pharmacy.command.impl.doctor;
+package by.chertok.pharmacy.command.impl.doctor;
 
-import main.java.by.chertok.pharmacy.command.ICommand;
-import main.java.by.chertok.pharmacy.command.Pages;
-import main.java.by.chertok.pharmacy.entity.Prescription;
-import main.java.by.chertok.pharmacy.entity.User;
-import main.java.by.chertok.pharmacy.exception.ServiceException;
-import main.java.by.chertok.pharmacy.service.PrescriptionService;
-import main.java.by.chertok.pharmacy.util.road.Path;
-import main.java.by.chertok.pharmacy.util.wrapper.Wrapper;
+import by.chertok.pharmacy.command.resources.AttributeName;
+import by.chertok.pharmacy.command.ICommand;
+import by.chertok.pharmacy.command.resources.PageStorage;
+import by.chertok.pharmacy.entity.Prescription;
+import by.chertok.pharmacy.entity.User;
+import by.chertok.pharmacy.exception.ServiceException;
+import by.chertok.pharmacy.service.PrescriptionService;
+import by.chertok.pharmacy.util.path.Path;
+import by.chertok.pharmacy.util.wrapper.Wrapper;
 import org.apache.log4j.Logger;
 
 import java.util.List;
 
 public class ListPrescriptionCommand implements ICommand {
     private static final Logger LOGGER = Logger.getLogger(ListPrescriptionCommand.class);
+    private static final String FAIL = "There are no any prescriptions at the moment";
     private PrescriptionService prescriptionService;
 
-    public ListPrescriptionCommand(PrescriptionService prescriptionService){
+    public ListPrescriptionCommand(PrescriptionService prescriptionService) {
         this.prescriptionService = prescriptionService;
     }
 
@@ -30,20 +32,25 @@ public class ListPrescriptionCommand implements ICommand {
      */
     @Override
     public Path execute(Wrapper wrapper) {
-        try{
-            long doctorId = ((User) wrapper.getSessionAttribute("user")).getId();
+        try {
+            long doctorId = ((User) wrapper.getSessionAttribute(AttributeName.USER)).getId();
             List<Prescription> prescriptions = prescriptionService.readByDoctorId(doctorId);
+            Path path = new Path();
+            path.setForward(true);
 
             if (!prescriptions.isEmpty()) {
-                wrapper.setRequestAttribute("prescriptions", prescriptions);
+                wrapper.setRequestAttribute(AttributeName.PRESCRIPTIONS, prescriptions);
+                path.setUrl(PageStorage.PRESCRIPTIONS);
             } else {
-                wrapper.setRequestAttribute("emptyResultMsg", "Nothing was found");
+                wrapper.setRequestAttribute(AttributeName.EMPTY_RESULT_MSG, FAIL);
+                path.setUrl(PageStorage.PROFILE);
             }
-            return new Path(true, Pages.PRESCRIPTIONS);
-        } catch(ServiceException e){
-            LOGGER.error(e);
-            wrapper.setSessionAttribute("errMsg", e.getMessage());
-            return new Path(false, Pages.ERROR);
+            return path;
+        } catch (ServiceException e) {
+            LOGGER.error(e.getMessage());
+            e.printStackTrace();
+            wrapper.setSessionAttribute(AttributeName.ERROR_MSG, e.getMessage());
+            return new Path(false, PageStorage.ERROR);
         }
     }
 }
