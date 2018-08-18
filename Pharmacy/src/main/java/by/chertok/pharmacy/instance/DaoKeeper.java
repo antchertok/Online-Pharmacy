@@ -14,7 +14,7 @@ public class DaoKeeper {
     private OrderDao orderDao;
     private PrescriptionDao prescriptionDao;
 
-    private DaoKeeper(JdbcHelper jdbcHelper){
+    private DaoKeeper(JdbcHelper jdbcHelper) {
         userDao = new UserDaoImpl(jdbcHelper);
         drugDao = new DrugDaoImpl(jdbcHelper);
         orderDao = new OrderDaoImpl(jdbcHelper);

@@ -20,7 +20,7 @@ import javax.servlet.annotation.WebListener;
 public class ConnectionPoolInitializerListener implements ServletContextListener {
     private static final Logger LOGGER
             = Logger.getLogger(ConnectionPoolInitializerListener.class);
-    private static final String CONNECTION_POOL_ERROR
+    private static final String POOL_INIT_ERROR
             = "Connection pool hasn't been initialized";
 
     @Override
@@ -28,7 +28,7 @@ public class ConnectionPoolInitializerListener implements ServletContextListener
         try {
             ConnectionPool.poolStart();
         }catch (ConnectionPoolException e){
-            LOGGER.error(CONNECTION_POOL_ERROR, e);
+            LOGGER.error(POOL_INIT_ERROR, e);
         }
     }
 

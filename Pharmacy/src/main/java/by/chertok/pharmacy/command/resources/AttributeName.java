@@ -45,7 +45,7 @@ public interface AttributeName {
     String ORDERS = "orders";
     String PRESCRIPTION_ID = "prescriptionId";
     String ERROR_REG_MSG = "errorRegMsg";
-    String ACCESS_DENIED = "accessDeniedMsg";
+    String ACCESS_DENIED = "accessDeniedMessage";
     String INFO_CART_MSG = "infoCardMsg";
     String INFO_PRESCRIPTION = "infoPrescriptionMsg";
     String DRUG_ID_FOR_PRESC = "drugIdForPrescription";

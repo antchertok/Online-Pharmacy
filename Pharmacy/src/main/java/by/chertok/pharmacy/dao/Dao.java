@@ -2,6 +2,7 @@ package by.chertok.pharmacy.dao;
 
 import by.chertok.pharmacy.exception.DaoException;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +35,7 @@ public interface Dao<T> {//для прескрипшн:
      * @return the number of affected rows in the util if execution was
      * successful
      */
-    int create(T entity) throws DaoException;
+    int create(T entity) throws DaoException, SQLException;
 
     /**
      * Updates the data about given entity if it exists

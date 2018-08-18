@@ -7,6 +7,7 @@ import by.chertok.pharmacy.exception.ServiceException;
 import by.chertok.pharmacy.service.PrescriptionService;
 import org.apache.log4j.Logger;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,7 +49,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     public boolean create(Prescription entity) throws ServiceException {
         try {
             return prescriptionDao.create(entity) > 0;
-        } catch (DaoException e) {
+        } catch (DaoException | SQLException e) {
             LOGGER.error(e.getMessage(), e);
             throw new ServiceException(CREATING_PRESC_ERR_MSG, e);
         }

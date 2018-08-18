@@ -28,6 +28,7 @@ public class PrescriptionDaoImpl implements PrescriptionDao {
 
     public PrescriptionDaoImpl(JdbcHelper jdbcHelper) {
         this.jdbcHelper = jdbcHelper;
+
         rowMapper = resultSet -> {
             Prescription prescription = new Prescription(resultSet.getLong("id"));
             prescription.setValidUntil(resultSet.getTimestamp("valid_until").toLocalDateTime());

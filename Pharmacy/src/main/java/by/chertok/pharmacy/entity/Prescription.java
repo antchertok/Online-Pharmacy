@@ -88,12 +88,13 @@ public class Prescription extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Prescription that = (Prescription) o;
-        return doctorId == that.doctorId &&
-                approved == that.approved &&
-                drugName == null ? that.drugName == null : drugName.equals(that.drugName) &&
-                customerFirstName == null ? that.customerFirstName == null : customerFirstName.equals(that.customerFirstName) &&
-                customerLastName == null ? that.customerLastName == null : customerLastName.equals(that.customerLastName) &&
-                validUntil == null ? that.validUntil == null : validUntil.equals(that.validUntil);
+        return doctorId == that.doctorId && approved == that.approved
+                && drugName == null ? that.drugName == null : drugName.equals(that.drugName)
+                && customerFirstName == null ? that.customerFirstName == null
+                                             : customerFirstName.equals(that.customerFirstName)
+                && customerLastName == null ? that.customerLastName == null
+                                            : customerLastName.equals(that.customerLastName)
+                && validUntil == null ? that.validUntil == null : validUntil.equals(that.validUntil);
     }
 
     @Override
@@ -102,19 +103,13 @@ public class Prescription extends BaseEntity {
         return (int)(5 * getId() + 11 * doctorId + 7 * drugName.hashCode()
                 + 13 * customerFirstName.hashCode() + 3 * customerLastName.hashCode()
                 + 23 * validUntil.hashCode() + (approved ? 0 : 1));
-//                Objects.hash(super.hashCode(), validUntil, doctorId, drugId, customerId, approved);
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "{" +
-                super.toString() +
-                ", validUntil=" + validUntil +
-                ", doctorId=" + doctorId +
-                ", drug=" + drugName +
-                ", customer=" + customerFirstName +
-                " " + customerLastName +
-                ", approved=" + approved +
-                '}';
+        return getClass().getSimpleName() + "{" + super.toString()
+                + ", validUntil=" + validUntil + ", doctorId=" + doctorId
+                + ", drug=" + drugName + ", customer=" + customerFirstName
+                + " " + customerLastName + ", approved=" + approved + "}";
     }
 }

@@ -8,6 +8,7 @@ import by.chertok.pharmacy.entity.User;
 import by.chertok.pharmacy.exception.ServiceException;
 import by.chertok.pharmacy.service.UserService;
 import by.chertok.pharmacy.util.encoder.Encoder;
+import by.chertok.pharmacy.util.encoder.impl.EncoderMd5;
 import by.chertok.pharmacy.util.path.Path;
 import by.chertok.pharmacy.util.validator.ParameterValidator;
 import by.chertok.pharmacy.util.wrapper.Wrapper;
@@ -15,12 +16,12 @@ import org.apache.log4j.Logger;
 
 public class SignUpCommand implements ICommand {
     private static final Logger LOGGER = Logger.getLogger(SignUpCommand.class);
+    private static final String FAIL = "Failed to create account";
+    private static final String INVALID_DATA = "Invalid data";
     private UserService userService;
-    private Encoder encoder;
 
-    public SignUpCommand(UserService userService, Encoder encoder) {
+    public SignUpCommand(UserService userService) {
         this.userService = userService;
-        this.encoder = encoder;
     }
 
     /**
@@ -45,6 +46,7 @@ public class SignUpCommand implements ICommand {
             path.setUrl(PageStorage.START_PAGE);
 
             if (new ParameterValidator().isUserValid(user)) {
+                Encoder encoder = EncoderMd5.getInstance();
                 user.setPassword(encoder.encode(user.getPassword()));
 
                 if (userService.create(user)) {
@@ -57,12 +59,12 @@ public class SignUpCommand implements ICommand {
                     wrapper.setSessionAttribute(AttributeName.TOTAL, 0.0);
                     path.setForward(false);
                 } else {
-                    wrapper.setSessionAttribute(AttributeName.ERROR_MSG, "Failed to create account");
+                    wrapper.setSessionAttribute(AttributeName.ERROR_MSG, FAIL);
                     path.setForward(false);
                     path.setUrl(PageStorage.ERROR);
                 }
             } else {
-                wrapper.setRequestAttribute(AttributeName.ERROR_REG_MSG, "Invalid data");
+                wrapper.setRequestAttribute(AttributeName.ERROR_REG_MSG, INVALID_DATA);
                 path.setForward(true);
             }
             return path;

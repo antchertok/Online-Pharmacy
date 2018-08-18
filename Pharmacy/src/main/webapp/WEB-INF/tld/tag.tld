@@ -28,6 +28,16 @@
             <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
+    <tag>
+        <name>time-displaying</name>
+        <tag-class>by.chertok.pharmacy.tag.TimeDisplayingTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>time</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
 
     <!-- Invoke 'Generate' action to add tags or functions -->
 

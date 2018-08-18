@@ -7,6 +7,7 @@ import by.chertok.pharmacy.exception.ServiceException;
 import by.chertok.pharmacy.service.UserService;
 import org.apache.log4j.Logger;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,7 +60,7 @@ public class UserServiceImpl implements UserService {
     public boolean create(User entity) throws ServiceException {
         try {
             return userDao.create(entity) > 0;
-        } catch (DaoException e) {
+        } catch (DaoException | SQLException e) {
             LOGGER.error(e.getMessage(), e);
             throw new ServiceException(CREATING_USER_ERR_MSG, e);
         }

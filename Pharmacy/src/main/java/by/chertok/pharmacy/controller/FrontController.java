@@ -2,9 +2,9 @@ package by.chertok.pharmacy.controller;
 
 import by.chertok.pharmacy.command.CommandProvider;
 import by.chertok.pharmacy.command.ICommand;
+import by.chertok.pharmacy.command.resources.AttributeName;
 import by.chertok.pharmacy.util.path.Path;
 import by.chertok.pharmacy.util.wrapper.Wrapper;
-import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,7 +20,6 @@ import java.io.IOException;
         urlPatterns = "/controller"
 )
 public class FrontController extends HttpServlet {
-    private static final Logger LOGGER = Logger.getLogger(FrontController.class); //LOGGER
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -38,8 +37,8 @@ public class FrontController extends HttpServlet {
 
         Wrapper wrapper = new Wrapper();
         wrapper.extract(request);
-        CommandProvider provider = new CommandProvider();
-        ICommand command = provider.getCommandByName(wrapper.getRequestParameter("command"));
+        CommandProvider provider = CommandProvider.getInstance();
+        ICommand command = provider.getCommandByName(request.getParameter(AttributeName.COMMAND));
         Path path = command.execute(wrapper);
         wrapper.updateRequest(request);
 

@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`user` (
   `last_name` VARCHAR(25) NOT NULL,
   `speciality` VARCHAR(20) NULL,
   `doctor_id` INT NULL,
+  `activity` TINYINT(1) NOT NULL,
   UNIQUE INDEX `e-mail_UNIQUE` (`e-mail` ASC),
   PRIMARY KEY (`id`),
   UNIQUE INDEX `login_UNIQUE` (`login` ASC),
@@ -50,6 +51,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`order` (
   `order_id` INT NOT NULL AUTO_INCREMENT COMMENT 'Номер заказа.',
   `order_date` DATETIME NOT NULL COMMENT 'Дата заказа.',
   `customer_id` INT NOT NULL,
+  `total` FLOAT NOT NULL,
   PRIMARY KEY (`order_id`),
   INDEX `customer_id_idx` (`customer_id` ASC),
   CONSTRAINT `customer_id`
@@ -142,19 +144,19 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `mydb`;
-INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`) VALUES (1, 'First', MD5('qwerty1'), 'first@gmail.com', 'pharmacist', 'Галина', 'Петрова', NULL, NULL);
-INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`) VALUES (2, 'Second', MD5('qwerty2'), 'second@gmail.com', 'doctor', 'Николай', 'Богданов', 'ревматолог', NULL);
-INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`) VALUES (3, 'Third', MD5('qwerty3'), 'third@gmail.com', 'doctor', 'Семен', 'Каспаров', 'терапевт', NULL);
-INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`) VALUES (4, 'Fourth', MD5('qwerty4'), 'fourth@yandex.ru', 'pharmacist', 'Серегей', 'Игнатов', NULL, NULL);
-INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`) VALUES (5, 'Fifth', MD5('qwerty5'), 'fifth@yandex.ru', 'customer', 'Наталья', 'Троцкая', NULL, 2);
-INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`) VALUES (6, 'Sixth', MD5('qwerty6'), 'sixth@gmail.com', 'customer', 'Илья', 'Василенко', NULL, 2);
-INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`) VALUES (7, 'Seventh', MD5('qwerty7'), 'seventh@yahoo.com', 'customer', 'Павел', 'Игорев', NULL, 3);
-INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`) VALUES (8, 'Eighth', MD5('qwerty8'), 'eighth@yahoo.com', 'customer', 'Анна', 'Васильева', NULL, 3);
-INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`) VALUES (9, 'Nineth', MD5('qwerty9'), 'nineth@rambler.ru', 'customer', 'Петр', 'Одинец', NULL, 3);
-INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`) VALUES (10, 'Tenth', MD5('qwerty10'), 'tenth@tut.by', 'pharmacist', 'Татьяна', 'Приходько', NULL, NULL);
-INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`) VALUES (11, 'Eleven', MD5('qwerty11'), 'eleventh@tut.by', 'customer', 'Валентина', 'Валеренко', NULL, 3);
-INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`) VALUES (12, 'Twelve', MD5('qwerty12'), 'twelve@rambler.ru', 'customer', 'Геннадий', 'Клименко', NULL, 3);
-INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`) VALUES (13, 'Thirteen', MD5('qwerty13'), 'thirteen@gmail.com', 'customer', 'Зинаида', 'Рыбак', NULL, 2);
+INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`, `activity`) VALUES (1, 'First', MD5('qwerty1'), 'first@gmail.com', 'pharmacist', 'Галина', 'Петрова', NULL, NULL, 1);
+INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`, `activity`) VALUES (2, 'Second', MD5('qwerty2'), 'second@gmail.com', 'doctor', 'Николай', 'Богданов', 'ревматолог', NULL, 1);
+INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`, `activity`) VALUES (3, 'Third', MD5('qwerty3'), 'third@gmail.com', 'doctor', 'Семен', 'Каспаров', 'терапевт', NULL, 1);
+INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`, `activity`) VALUES (4, 'Fourth', MD5('qwerty4'), 'fourth@yandex.ru', 'pharmacist', 'Серегей', 'Игнатов', NULL, NULL, 1);
+INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`, `activity`) VALUES (5, 'Fifth', MD5('qwerty5'), 'fifth@yandex.ru', 'customer', 'Наталья', 'Троцкая', NULL, 2, 1);
+INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`, `activity`) VALUES (6, 'Sixth', MD5('qwerty6'), 'sixth@gmail.com', 'customer', 'Илья', 'Василенко', NULL, 2, 1);
+INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`, `activity`) VALUES (7, 'Seventh', MD5('qwerty7'), 'seventh@yahoo.com', 'customer', 'Павел', 'Игорев', NULL, 3, 1);
+INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`, `activity`) VALUES (8, 'Eighth', MD5('qwerty8'), 'eighth@yahoo.com', 'customer', 'Анна', 'Васильева', NULL, 3, 1);
+INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`, `activity`) VALUES (9, 'Nineth', MD5('qwerty9'), 'nineth@rambler.ru', 'customer', 'Петр', 'Одинец', NULL, 3, 1);
+INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`, `activity`) VALUES (10, 'Tenth', MD5('qwerty10'), 'tenth@tut.by', 'pharmacist', 'Татьяна', 'Приходько', NULL, NULL, 1);
+INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`, `activity`) VALUES (11, 'Eleven', MD5('qwerty11'), 'eleventh@tut.by', 'customer', 'Валентина', 'Валеренко', NULL, 3, 1);
+INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`, `activity`) VALUES (12, 'Twelve', MD5('qwerty12'), 'twelve@rambler.ru', 'customer', 'Геннадий', 'Клименко', NULL, 3, 1);
+INSERT INTO `mydb`.`user` (`id`, `login`, `password`, `e-mail`, `role`, `first_name`, `last_name`, `speciality`, `doctor_id`, `activity`) VALUES (13, 'Thirteen', MD5('qwerty13'), 'thirteen@gmail.com', 'customer', 'Зинаида', 'Рыбак', NULL, 2, 1);
 
 COMMIT;
 
@@ -164,15 +166,15 @@ COMMIT;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `mydb`;
-INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`) VALUES (1, '2018-06-24 07:34:13', 5);
-INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`) VALUES (2, '2018-06-24 14:21:42', 2);
-INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`) VALUES (3, '2018-06-25 16:03:47', 3);
-INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`) VALUES (4, '2018-06-26 09:57:01', 6);
-INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`) VALUES (5, '2018-06-26 11:15:26', 7);
-INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`) VALUES (6, '2018-06-26 17:14:52', 8);
-INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`) VALUES (7, '2018-06-26 20:48:21', 9);
-INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`) VALUES (8, '2018-06-27 17:03:10', 8);
-INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`) VALUES (9, '2018-06-27 18:37:31', 11);
+INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`, `total`) VALUES (1, '2018-06-24 07:34:13', 5, 3);
+INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`, `total`) VALUES (2, '2018-06-24 14:21:42', 2, 100.43);
+INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`, `total`) VALUES (3, '2018-06-25 16:03:47', 3, 15.66);
+INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`, `total`) VALUES (4, '2018-06-26 09:57:01', 6, 11);
+INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`, `total`) VALUES (5, '2018-06-26 11:15:26', 7, 0.5);
+INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`, `total`) VALUES (6, '2018-06-26 17:14:52', 8, 23.99);
+INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`, `total`) VALUES (7, '2018-06-26 20:48:21', 9, 13.98);
+INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`, `total`) VALUES (8, '2018-06-27 17:03:10', 8, 1);
+INSERT INTO `mydb`.`order` (`order_id`, `order_date`, `customer_id`, `total`) VALUES (9, '2018-06-27 18:37:31', 11, 4.44);
 
 COMMIT;
 

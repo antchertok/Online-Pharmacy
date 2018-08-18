@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%--
   Created by IntelliJ IDEA.
   User: --
@@ -12,6 +13,7 @@
     <title>Title</title>
 </head>
 <body>
+    <fmt:setLocale value="en-EN"/>
     <c:redirect url="/controller">
         <c:param name="command" value="seek-drug"/>
         <c:param name="name" value=""/>

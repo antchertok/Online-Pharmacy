@@ -5,6 +5,5 @@
          version="4.0">
     <welcome-file-list>
         <welcome-file>redirect.jsp</welcome-file>
-        <!--<welcome-file>controller?command=seek-drug&amp;pageNumber=1&amp;elements=7&amp;name=</welcome-file>-->
     </welcome-file-list>
 </web-app>

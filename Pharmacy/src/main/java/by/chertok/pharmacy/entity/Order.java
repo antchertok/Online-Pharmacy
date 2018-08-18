@@ -7,9 +7,9 @@ import java.util.Map;
 public class Order extends BaseEntity {
 
     private LocalDateTime orderDate;
-    private long pharmacistId;
     private long customerId;
     private Map<Long, Integer> drugs;
+    private double total;
 
     public Order(long id) {
         super(id);
@@ -22,14 +22,6 @@ public class Order extends BaseEntity {
 
     public void setOrderDate(LocalDateTime orderDate) {
         this.orderDate = orderDate;
-    }
-
-    public long getPharmacistId() {
-        return pharmacistId;
-    }
-
-    public void setPharmacistId(long pharmacistId) {
-        this.pharmacistId = pharmacistId;
     }
 
     public long getCustomerId() {
@@ -48,8 +40,20 @@ public class Order extends BaseEntity {
         drugs.clear();
     }
 
+    public int getDrugsOrdered(){
+        return drugs.size();
+    }
+
     public Map<Long, Integer> getDrugs() {
         return drugs;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
     }
 
     @Override
@@ -58,24 +62,22 @@ public class Order extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Order order = (Order) o;
-        return pharmacistId == order.pharmacistId &&
-                customerId == order.customerId &&
-                orderDate == null ? order.orderDate == null : orderDate.equals(order.orderDate);
+        return customerId == order.customerId
+                && total == order.total
+                && orderDate == null ? order.orderDate == null
+                                     : orderDate.equals(order.orderDate);
     }
 
     @Override
     public int hashCode() {
 
-        return (int) (3 * getId() + 13 * pharmacistId + 17 * customerId + 7 * orderDate.hashCode());
+        return (int) (3 * getId() +  17 * customerId + 7 * orderDate.hashCode()
+                + 3 * total);
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "{" +
-                super.toString() +
-                "orderDate=" + orderDate +
-                ", pharmacistId=" + pharmacistId +
-                ", customerId=" + customerId +
-                '}';
+        return getClass().getSimpleName() + "{" + super.toString()
+                + "orderDate=" + orderDate + ", customerId=" + customerId + "}";
     }
 }

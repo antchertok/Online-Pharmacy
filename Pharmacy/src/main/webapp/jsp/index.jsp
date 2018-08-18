@@ -111,7 +111,7 @@
 
             <div class="jumbotron">
                 <h4><fmt:message key = "label.product-range" bundle = "${locale}"/></h4>
-                ${infoOrderMsg}
+                ${emptyResultMsg}
                 <c:if test="${requestScope.infoPrescriptionMsg ne null}">
                     <label>${requestScope.infoPrescriptionMsg}</label><br/>
                     <c:if test="${sessionScope.user.doctorId eq 0}">
@@ -124,9 +124,49 @@
                     </form>
                 </c:if>
                 <ctg:page-listing list="${sessionScope.drugList}" elementsOnPage="7" pageNumber="${sessionScope.pageNumber}"/>
-
+                <%--<c:forEach var="drug" items="${sessionScope.drugList}">--%>
+                    <%--<div class="panel panel-default">--%>
+                        <%--<div class="panel-body">--%>
+                            <%--<div class="row" >--%>
+                                <%--<div class="col-sm-3">--%>
+                                    <%--<label>${drug.name}, ${drug.dose}</label>--%>
+                                <%--</div>--%>
+                                <%--<div class="col-sm-3">--%>
+                                    <%--<label>${drug.price} <fmt:message bundle="${locale}" key="label.currency"/> </label>--%>
+                                <%--</div>--%>
+                                <%--<div class="col-sm-4" id="to-card-button">--%>
+                                    <%--<form name="AddToCardForm" action="/controller">--%>
+                                        <%--<input type="hidden" name="command" value="add-to-card"/>--%>
+                                        <%--<input type="hidden" name="price" value="${drug.price}"/>--%>
+                                        <%--<input type="hidden" name="drugId" value="${drug.id}"/>--%>
+                                        <%--<input type="number" id="amount" class="amount-of-drug" --%>
+                                               <%--required min="1" name="amount" value="" --%>
+                                               <%--placeholder="<fmt:message bundle="${locale}" key="label.amount"/>" --%>
+                                               <%--<c:if test="${sessionScope.user eq null}">disabled</c:if>/>--%>
+                                        <%--<input type="submit" name="submit" class="submit-amount" --%>
+                                               <%--value="<fmt:message bundle="${locale}" key="button.add-to-cart"/>" --%>
+                                               <%--<c:if test="${sessionScope.user eq null}">disabled</c:if>/>--%>
+                                    <%--</form>--%>
+                                <%--</div>--%>
+                                <%--<div class="col-sm-2">--%>
+                                    <%--<form name="AlternateDrug" action="/controller">--%>
+                                        <%--<input type="hidden" name="command" value="to-alternating-drug"/>--%>
+                                        <%--<input type="hidden" name="drugId" value="${drug.id}"/>--%>
+                                        <%--<input type="hidden" name="name" value="${drug.name}"/>--%>
+                                        <%--<input type="hidden" name="price" value="${drug.price}"/>--%>
+                                        <%--<input type="hidden" name="prescription" value="${drug.prescription}"/>--%>
+                                        <%--<input type="hidden" name="dose" value="${drug.dose}"/>--%>
+                                        <%--<input type="submit" name="submit" --%>
+                                               <%--value="<fmt:message bundle="${locale}" key="locale.alternate"/>"--%>
+                                               <%--<c:if test="${sessionScope.user eq null}">disabled placeholder="Only for pharmacists" </c:if>/>/>--%>
+                                    <%--</form>--%>
+                                <%--</div>    --%>
+                            <%--</div>--%>
+                        <%--</div>--%>
+                    <%--</div>    --%>
+                <%--</c:forEach>--%>
                 <hr/>
-                ${emptyResultMsg}
+
 
             </div>
         </div>
@@ -143,7 +183,7 @@
                         <c:otherwise>
                             <div class="user-info">
                                 <span>
-                                    <fmt:message key = "label.profile" bundle = "${locale}"/>: ${sessionScope.user.role} <br/>
+                                    <fmt:message key = "label.profile" bundle = "${locale}"/>: <fmt:message key = "label.${sessionScope.user.role}" bundle = "${locale}"/><br/>
                                     ${sessionScope.user.firstName} ${sessionScope.user.lastName}<br/>
                                 </span>
                             </div>
@@ -203,12 +243,12 @@
     <form name=LocaleRUChanging" action="/controller" id="toRU">
         <input type="hidden" name="currentUrl" value="jsp/index.jsp"/>
         <input type="hidden" name="command" value="change-locale"/>
-        <input type="hidden" name="locale" value="ru"/>
+        <input type="hidden" name="locale" value="ru-RU"/>
     </form>
     <form name=LocaleENChanging" action="/controller" id="toEN">
         <input type="hidden" name="currentUrl" value="jsp/index.jsp"/>
         <input type="hidden" name="command" value="change-locale"/>
-        <input type="hidden" name="locale" value="en"/>
+        <input type="hidden" name="locale" value="en-EN"/>
     </form>
     <div class="btn-group">
         <button type="submit" class="btn " form="toEN" value="submit">

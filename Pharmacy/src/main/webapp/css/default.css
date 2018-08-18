@@ -126,7 +126,7 @@ h4{
 .no-doctor-msg{
     color: red;
 }
-.parameters-insertion{
+#parameters-insertion{
     text-align: center;
 }
 .col-sm-1{
@@ -142,5 +142,8 @@ h4{
     font-size: 12px;
 }
 .approving-order{
+    text-align: center;
+}
+#alternating-form{
     text-align: center;
 }

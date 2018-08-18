@@ -37,6 +37,7 @@ public class ApproveOrderCommand implements ICommand {
         try {
             Order order = (Order) wrapper.getSessionAttribute(AttributeName.ORDER);
             order.setOrderDate(LocalDateTime.now());
+            order.setTotal((Double)wrapper.getSessionAttribute(AttributeName.TOTAL));
             Path path = new Path();
             path.setUrl(wrapper.getRequestParameter(AttributeName.CURRENT_URL));
 

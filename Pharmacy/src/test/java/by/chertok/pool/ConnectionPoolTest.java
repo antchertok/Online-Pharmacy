@@ -27,7 +27,7 @@ public class ConnectionPoolTest {
     }
 
     @Test
-    public void getConnectionTest() throws InterruptedException{
+    public void getConnectionTest() throws ConnectionPoolException{
         Connection connection = ConnectionPool.getInstance().getConnection();
         Assert.assertNotNull(connection);
     }

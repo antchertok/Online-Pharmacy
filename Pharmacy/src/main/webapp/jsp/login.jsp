@@ -61,7 +61,7 @@
                                         <span class="errorMsg" id="loginIn"></span><br/>
                                         <label>${password}: <br/></label><input type="password" name="password" class="user-info-input" required value=""/><br/>
                                         <span class="errorMsg" id="passwordIn"></span><br/>
-                                        <input type="submit" value="${logbut}"/>
+                                        <input type="submit" value="${logbut}"/><br/>
                                         ${requestScope.accessDeniedMessage}
                                     </form>
                                 </div>

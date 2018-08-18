@@ -8,22 +8,19 @@ import by.chertok.pharmacy.entity.User;
 import by.chertok.pharmacy.exception.ServiceException;
 import by.chertok.pharmacy.service.UserService;
 import by.chertok.pharmacy.util.encoder.Encoder;
+import by.chertok.pharmacy.util.encoder.impl.EncoderMd5;
 import by.chertok.pharmacy.util.path.Path;
 import by.chertok.pharmacy.util.wrapper.Wrapper;
 import org.apache.log4j.Logger;
-
 import java.util.Optional;
 
 public class LogInCommand implements ICommand {
     private static final Logger LOGGER = Logger.getLogger(LogInCommand.class);
-
     private static final String ACCESS_DENIED_MSG = "Access Denied. Wrong login and/or password.";
     private UserService userService;
-    private Encoder encoder;
 
-    public LogInCommand(UserService userService, Encoder encoder) {
+    public LogInCommand(UserService userService) {
         this.userService = userService;
-        this.encoder = encoder;
     }
 
     /**
@@ -38,6 +35,7 @@ public class LogInCommand implements ICommand {
     public Path execute(Wrapper wrapper) {
         try {
             String login = wrapper.getRequestParameter(AttributeName.LOGIN);
+            Encoder encoder = EncoderMd5.getInstance();
             String password = encoder.encode(wrapper.getRequestParameter(AttributeName.PASSWORD).trim());
             Optional<User> user = userService.readByLoginPassword(login, password);
             Path path = new Path();

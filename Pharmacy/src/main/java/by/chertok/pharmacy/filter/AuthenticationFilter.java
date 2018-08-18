@@ -23,7 +23,6 @@ import java.util.EnumSet;
         dispatcherTypes = {DispatcherType.REQUEST, DispatcherType.FORWARD})
 public class AuthenticationFilter implements Filter {
     private static final Logger LOGGER = Logger.getLogger(AuthenticationFilter.class);
-    private static final String UNACCEPTABLE_REQUEST = "Unacceptable request";
     private static final String UNACCEPTABLE_COMMAND = "Unacceptable command";
 
     private EnumSet<CommandHolder> freeCommands;
@@ -49,12 +48,12 @@ public class AuthenticationFilter implements Filter {
         boolean isLegal = true;
 
         if(commandName != null && !commandName.isEmpty()){
-            commandName = new CommandProvider().convertCommand(commandName);
+            commandName = commandName.replace('-','_').toUpperCase();
             CommandHolder command = null;
             try {
                 command = CommandHolder.valueOf(commandName);
             } catch (IllegalArgumentException e){
-                LOGGER.error(e);
+                LOGGER.info(UNACCEPTABLE_COMMAND);
                 request.getSession().setAttribute(AttributeName.ERROR_MSG, UNACCEPTABLE_COMMAND);
                 request.getRequestDispatcher(PageStorage.ERROR).forward(request, response);
             }
@@ -62,6 +61,7 @@ public class AuthenticationFilter implements Filter {
 
             if(user != null){
                 String role = user.getRole();
+
                 if((role.equals(AttributeName.CUSTOMER_ROLE)
                         && !customerCommands.contains(command))
                         ||(role.equals(AttributeName.PHARMACIST_ROLE)

@@ -30,6 +30,7 @@ public class DrugDaoImpl implements DrugDao {
 
     public DrugDaoImpl(JdbcHelper jdbcHelper) {
         this.jdbcHelper = jdbcHelper;
+
         rowMapper = resultSet -> {
             Drug drug = new Drug(resultSet.getLong("drug_id"));
             drug.setName(resultSet.getString("name"));

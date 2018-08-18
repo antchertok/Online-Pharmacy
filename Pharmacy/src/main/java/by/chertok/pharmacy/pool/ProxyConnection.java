@@ -16,7 +16,7 @@ public class ProxyConnection implements Connection {
         this.connection = connection;
     }
 
-    public void closeConnection() throws SQLException {
+    public void reallyClose() throws SQLException {
         connection.close();
     }
 

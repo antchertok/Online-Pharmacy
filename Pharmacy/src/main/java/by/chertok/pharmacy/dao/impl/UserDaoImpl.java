@@ -24,7 +24,8 @@ public class UserDaoImpl implements UserDao {
 
     public UserDaoImpl(JdbcHelper jdbcHelper) {
         this.jdbcHelper = jdbcHelper;
-        rowMapper = (resultSet) -> {
+
+        rowMapper = resultSet -> {
             User user = new User(resultSet.getInt("id"));
             user.setLogin(resultSet.getString("login"));
             user.setPassword(resultSet.getString("password"));

@@ -1,6 +1,7 @@
 <!DOCTYPE jsp>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="ctg" uri="pharmacytags" %>
 <%--
   Created by IntelliJ IDEA.
   User: --
@@ -122,13 +123,13 @@
     </nav>
 
     <div class="row">
-        <div class="col-sm-9" >
+        <div class="col-sm-9">
 
             <div class="jumbotron">
 
                 <label>${emptyResultMsg}</label><br/>
-                <div class="user-data" class="parameters-insertion">
-                    <h4><label>User data</label></h4>
+                <div class="user-data" id="parameters-insertion" >
+                    <h4><label><fmt:message key = "label.user-data" bundle = "${locale}"/></label></h4>
                     <c:choose>
                         <c:when test="${alternating ne 'true'}" >
                             <div class="parameter-list">
@@ -171,9 +172,6 @@
                     </c:if>
                     <a href="/controller?command=delete-user" class="delete-acc"><fmt:message key = "label.delete-acc" bundle = "${locale}"/></a>
                 </div>
-                <hr/>
-                <a name="current-order"></a>
-                <hr/>
                     <c:forEach var="drugEntry" items="${currentOrder}">
                         <div class="panel panel-default">
                             <div class="panel-body">
@@ -216,7 +214,7 @@
                     <input type="submit" name="submit" value="<fmt:message key = "button.history" bundle = "${locale}"/>" />
                     ${requestScope.noOrderMsg}
                     <c:forEach var="order" items="${orders}">
-                        Order: date: ${order.orderDate}, customer: ${order.customerId}
+                        <label>Order: date: <ctg:time-displaying time="${order.orderDate}"/>, items: ${order.drugsOrdered}, total: ${order.total}</label><hr/>
                     </c:forEach>
                 </form>
 
@@ -236,7 +234,7 @@
                         <c:otherwise>
                             <div class="user-info">
                                 <span>
-                                    <fmt:message key = "label.profile" bundle = "${locale}"/>: ${sessionScope.user.role} <br/>
+                                    <fmt:message key = "label.profile" bundle = "${locale}"/>: <fmt:message key = "label.${sessionScope.user.role}" bundle = "${locale}"/> <br/>
                                     ${sessionScope.user.firstName} ${sessionScope.user.lastName}<br/>
                                 </span>
                             </div>

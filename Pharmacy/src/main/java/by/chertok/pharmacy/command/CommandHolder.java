@@ -16,10 +16,10 @@ public enum CommandHolder {
 
     //all
     SEEK_DRUG(new SeekDrugsCommand(ServiceKeeper.getInstance().getDrugService())),
-    SIGN_UP(new SignUpCommand(ServiceKeeper.getInstance().getUserService(), new EncoderMd5())),
+    SIGN_UP(new SignUpCommand(ServiceKeeper.getInstance().getUserService())),
     CHANGE_LOCALE(new ChangeLocaleCommand()),
     HOME_PAGE(new ToHomePageCommand()),
-    LOGIN(new LogInCommand(ServiceKeeper.getInstance().getUserService(), new EncoderMd5())),
+    LOGIN(new LogInCommand(ServiceKeeper.getInstance().getUserService())),
 
     //users only
     LOGOUT(new LogOutCommand()),

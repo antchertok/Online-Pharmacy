@@ -44,7 +44,7 @@
             <button type="submit" class="btn " form="seekDrug" value="submit" id="start-search">
                 <label><span class="glyphicon glyphicon-search"></span></label>
             </button>
-            <ul class="nav navbar-nav" class="sidelist">
+            <ul class="nav navbar-nav" id="sidelist">
 
                 <c:choose>
                     <c:when test="${sessionScope.user.role eq 'pharmacist'}">
@@ -121,8 +121,8 @@
                             </c:choose>
                         </label>
                     </h3>
-                    <div class="row">
-                        <div class="col-sm-12" >
+                    <div class="row" id="alternating-form">
+                        <div class="col-sm-12" style="display: inline-block" >
                             <form name="AltDrug"  action="/controller" class="alt-drug">
                                 <input type="hidden" name="command" <c:choose>
                                     <c:when test="${requestScope.alternating eq true}">
@@ -133,9 +133,9 @@
                                     </c:otherwise>
                                 </c:choose>/>
                                 <input type="hidden" name="drugId" value="${requestScope.drugId}"/>
-                                <label><fmt:message key = "label.name" bundle = "${locale}"/><br/><input type="text" name="name" required value="${requestScope.name}"/></label><br/>
+                                <label><fmt:message key = "label.name" bundle = "${locale}"/></label><br/><input type="text" name="name" required value="${requestScope.name}"/><br/>
                                 <label><fmt:message key = "label.dose" bundle = "${locale}"/><br/><input type="number" min="0" name="dose" required value="${requestScope.dose}"/></label><br/>
-                                <label><fmt:message key = "label.price" bundle = "${locale}"/><br/><input type="number" min="0.01" step="0.01" name="price" required value="${requestScope.price}"/></label><br/> <!--FLOAT?-->
+                                <label><fmt:message key = "label.price" bundle = "${locale}"/><br/><input type="number" min="0.01" step="0.01" name="price" required value="${requestScope.price}"/></label><br/>
                                 <label><fmt:message key = "label.prescription" bundle = "${locale}"/><br/><input type="number" min="0" max="1" name="prescription" value="${requestScope.prescription}"/></label><br/>
                                 <input type="submit" name="submit" <c:choose>
                                     <c:when test="${requestScope.alternating eq true}">

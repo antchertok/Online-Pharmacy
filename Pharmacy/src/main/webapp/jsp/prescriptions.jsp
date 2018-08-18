@@ -158,7 +158,7 @@
                         <c:otherwise>
                             <div class="user-info">
                                 <span>
-                                    <fmt:message key = "label.profile" bundle = "${locale}"/>: ${sessionScope.user.role} <br/>
+                                    <fmt:message key = "label.profile" bundle = "${locale}"/>: <fmt:message key = "label.${sessionScope.user.role}" bundle = "${locale}"/> <br/>
                                     ${sessionScope.user.firstName} ${sessionScope.user.lastName}<br/>
                                 </span>
                             </div>

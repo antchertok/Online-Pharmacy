@@ -85,14 +85,14 @@ public class User extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return doctorId == user.doctorId &&
-                login == null ? user.login == null : login.equals(user.login)&&
-                password == null ? user.password == null : password.equals(user.password)&&
-                firstName == null ? user.firstName == null : firstName.equals(user.firstName)&&
-                lastName == null ? user.lastName == null : lastName.equals(user.lastName)&&
-                mail == null ? user.mail == null : mail.equals(user.mail)&&
-                role == null ? user.role == null : role.equals(user.role)&&
-                speciality == null ? user.speciality == null : speciality.equals(user.speciality);
+        return doctorId == user.doctorId
+                && login == null ? user.login == null : login.equals(user.login)
+                && password == null ? user.password == null : password.equals(user.password)
+                && firstName == null ? user.firstName == null : firstName.equals(user.firstName)
+                && lastName == null ? user.lastName == null : lastName.equals(user.lastName)
+                && mail == null ? user.mail == null : mail.equals(user.mail)
+                && role == null ? user.role == null : role.equals(user.role)
+                && speciality == null ? user.speciality == null : speciality.equals(user.speciality);
     }
 
     @Override
@@ -105,16 +105,10 @@ public class User extends BaseEntity {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "{" +
-                super.toString() +
-                "login='" + login + '\'' +
-                ", password='" + password + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", mail='" + mail + '\'' +
-                ", role='" + role + '\'' +
-                ", speciality='" + speciality + '\'' +
-                ", doctorId=" + doctorId +
-                '}';
+        return getClass().getSimpleName() + "{" + super.toString()
+                + "login='" + login + ", password='" + password
+                + ", firstName='" + firstName + ", lastName='" + lastName
+                + ", mail='" + mail + ", role='" + role + ", speciality='"
+                + speciality + ", doctorId=" + doctorId + '}';
     }
 }

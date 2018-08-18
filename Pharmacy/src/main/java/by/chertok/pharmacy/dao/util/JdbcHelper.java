@@ -1,5 +1,6 @@
 package by.chertok.pharmacy.dao.util;
 
+import by.chertok.pharmacy.exception.ConnectionPoolException;
 import by.chertok.pharmacy.exception.DaoException;
 import by.chertok.pharmacy.exception.EmptyResultException;
 import by.chertok.pharmacy.pool.ConnectionPool;
@@ -25,9 +26,6 @@ public class JdbcHelper {
     private static final String EMPTY_RESULT_MSG = "No data matches in database...";
     private static final String FAILED_QUERY_MSG = "Failed to execute query";
     private static final String FAILED_TO_LOAD_MSG = "Failed to load objects from result set";
-    private static final String FAILED_TO_ROLL_BACK_MSG = "Failed to roll back";
-    private static final String FAILED_FINISH_TRANSACTION_MSG = "Transaction wasn't finished";
-    private static final String INVALID_AMOUNT_OF_PARAMETERS_MSG = "Invalid amount of arguments";
 
     public JdbcHelper(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
@@ -49,52 +47,8 @@ public class JdbcHelper {
              PreparedStatement statement = connection.prepareStatement(sqlRequest)) {
 
             return buildStatement(statement, parameters).executeUpdate();
-        } catch (InterruptedException | SQLException e) {
+        } catch (ConnectionPoolException | SQLException e) {
             throw new DaoException(FAILED_QUERY_MSG, e);
-        }
-    }
-
-    /**
-     * Method for making UPDATE, DELETE and INSERT requests to util
-     *
-     * @param sqlRequests array of strings describing sql requests
-     * @param parameters  array of parameters to insert into sql request
-     * @return the number of executed updates
-     * @throws DaoException if failed to execute any stage
-     * @throws SQLException if failed to close connection or statement
-     */
-    public int executeMassiveUpdate(String[] sqlRequests, Object[][] parameters) throws DaoException, SQLException {
-        if (sqlRequests.length != parameters.length) {
-            throw new DaoException(INVALID_AMOUNT_OF_PARAMETERS_MSG);
-        }
-
-        Connection connection = null;
-        PreparedStatement statement = null;
-        try {
-            connection = connectionPool.getConnection();
-            connection.setAutoCommit(false);
-            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-
-            int i = 0;
-            for (; i < sqlRequests.length; i++) {
-                statement = connection.prepareStatement(sqlRequests[i]);
-                buildStatement(statement, parameters[i]).executeUpdate();
-            }
-            connection.commit();
-
-            return i;
-        } catch (InterruptedException | SQLException e) {
-            if (connection != null) {
-                rollback(connection);
-            }
-            throw new DaoException(FAILED_FINISH_TRANSACTION_MSG, e);
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
-            if (statement != null) {
-                statement.close();
-            }
         }
     }
 
@@ -119,7 +73,8 @@ public class JdbcHelper {
 
             ResultSet resultSet = buildStatement(statement, parameters).executeQuery();
             return mappingRows(resultSet, rowMapper);
-        } catch (InterruptedException | SQLException e) {
+        } catch (ConnectionPoolException | SQLException e) {
+            System.out.println(e);
             throw new DaoException(FAILED_TO_LOAD_MSG, e);
         }
     }
@@ -145,7 +100,7 @@ public class JdbcHelper {
             ResultSet resultSet = buildStatement(statement, parameters).executeQuery();
 
             return resultSet.next() ? Optional.of(rowMapper.mapRow(resultSet)) : Optional.empty();
-        } catch (InterruptedException | SQLException e) {
+        } catch (ConnectionPoolException | SQLException e) {
             throw new DaoException(FAILED_TO_LOAD_MSG, e);
         }
     }
@@ -170,7 +125,7 @@ public class JdbcHelper {
             } else {
                 throw new EmptyResultException(EMPTY_RESULT_MSG);
             }
-        } catch (InterruptedException | SQLException e) {
+        } catch (ConnectionPoolException | SQLException e) {
             throw new DaoException(FAILED_QUERY_MSG, e);
         }
     }
@@ -227,13 +182,5 @@ public class JdbcHelper {
             }
         }
         return statement;
-    }
-
-    private void rollback(Connection connection) throws DaoException {
-        try {
-            connection.rollback();
-        } catch (SQLException e) {
-            throw new DaoException(FAILED_TO_ROLL_BACK_MSG, e);
-        }
     }
 }

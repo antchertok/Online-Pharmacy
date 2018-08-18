@@ -52,23 +52,20 @@ public class Drug extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Drug drug = (Drug) o;
-        return prescription == drug.prescription &&
-                dose == drug.dose &&
-                name == null ? drug.name == null : name.equals(drug.name);
+        return prescription == drug.prescription && dose == drug.dose
+                && name == null ? drug.name == null : name.equals(drug.name);
     }
 
     @Override
     public int hashCode() {
 
-        return (int) (23 * getId() + 19 * dose + 37 * prescription + name.hashCode());
+        return (int) (23 * getId() + 19 * dose + 37 * prescription
+                + name.hashCode());
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "{" +
-                "name='" + name + '\'' +
-                ", dose=" + dose +
-                ", prescription=" + prescription +
-                '}';
+        return getClass().getSimpleName() + "{" + "name='" + name + '\''
+                + ", dose=" + dose + ", prescription=" + prescription + "}";
     }
 }

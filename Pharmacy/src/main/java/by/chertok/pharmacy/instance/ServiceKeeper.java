@@ -1,6 +1,5 @@
 package by.chertok.pharmacy.instance;
 
-
 import by.chertok.pharmacy.service.*;
 import by.chertok.pharmacy.service.impl.*;
 
@@ -8,7 +7,6 @@ import by.chertok.pharmacy.service.impl.*;
  * Auxiliary class providing access to service objects
  */
 public class ServiceKeeper {
-
     private DrugService drugService;
     private OrderService orderService;
     private PrescriptionService prescriptionService;
