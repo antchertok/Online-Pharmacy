@@ -51,12 +51,11 @@ public class AddDrugCommand implements ICommand {
             }
             return path;
         } catch (NumberFormatException e) {
-            LOGGER.error(e.getMessage());
             wrapper.setRequestAttribute(AttributeName.INFO_MSG, INVALID_PARAMETERS);
             path.setForward(true);
             return path;
         } catch (ServiceException e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e);
             wrapper.setSessionAttribute(AttributeName.ERROR_MSG, e.getMessage());
             return new Path(false, PageStorage.ERROR);
         }

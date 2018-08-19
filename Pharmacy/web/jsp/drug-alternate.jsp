@@ -94,7 +94,7 @@
                     </c:when>
                     <c:otherwise>
                         <li>
-                            <a href="../jsp/login.jsp">
+                            <a href="login.jsp">
                                 <label><fmt:message key = "button.login" bundle = "${locale}"/></label>
                             </a>
                         </li>

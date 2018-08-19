@@ -45,12 +45,13 @@ public class SeekDrugsCommand implements ICommand {
                 wrapper.setSessionAttribute(AttributeName.NAME, name);
                 wrapper.setSessionAttribute(AttributeName.PAGE_NUMBER, pageNumber);
                 wrapper.setSessionAttribute(AttributeName.AMOUNT_OF_RECORDS, amountOfRecords);
+                wrapper.setSessionAttribute("amountOfPages", (int) Math.ceil(amountOfRecords / (double) elementsOnPage));
                 wrapper.setSessionAttribute(AttributeName.DRUG_LIST, drugList);
             }
 
             return new Path(true, PageStorage.START_PAGE);
         } catch (ServiceException | NumberFormatException e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e);
             wrapper.setSessionAttribute(AttributeName.ERROR_MSG, e);
             return new Path(false, PageStorage.ERROR);
         }

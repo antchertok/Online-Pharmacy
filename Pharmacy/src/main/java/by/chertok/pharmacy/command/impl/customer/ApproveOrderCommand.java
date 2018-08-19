@@ -11,6 +11,7 @@ import by.chertok.pharmacy.util.path.Path;
 import by.chertok.pharmacy.util.wrapper.Wrapper;
 import org.apache.log4j.Logger;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 public class ApproveOrderCommand implements ICommand {
@@ -36,7 +37,7 @@ public class ApproveOrderCommand implements ICommand {
     public Path execute(Wrapper wrapper) {
         try {
             Order order = (Order) wrapper.getSessionAttribute(AttributeName.ORDER);
-            order.setOrderDate(LocalDateTime.now());
+            order.setOrderDate(LocalDateTime.now(Clock.systemUTC()));
             order.setTotal((Double)wrapper.getSessionAttribute(AttributeName.TOTAL));
             Path path = new Path();
             path.setUrl(wrapper.getRequestParameter(AttributeName.CURRENT_URL));
@@ -56,7 +57,7 @@ public class ApproveOrderCommand implements ICommand {
                 return path;
             }
         } catch (ServiceException e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e);
             wrapper.setSessionAttribute(AttributeName.ERROR_MSG, e.getMessage());
             return new Path(false, PageStorage.ERROR);
         }

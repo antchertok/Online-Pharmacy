@@ -1,7 +1,6 @@
 <!DOCTYPE jsp>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="ctg" uri="pharmacytags" %>
 <%--
   Created by IntelliJ IDEA.
   User: --
@@ -123,51 +122,71 @@
                         <input type="submit" value="<fmt:message key = "button.send-request" bundle = "${locale}"/>" <c:if test="${sessionScope.user.doctorId eq 0}">disabled</c:if>/>
                     </form>
                 </c:if>
-                <ctg:page-listing list="${sessionScope.drugList}" elementsOnPage="7" pageNumber="${sessionScope.pageNumber}"/>
-                <%--<c:forEach var="drug" items="${sessionScope.drugList}">--%>
-                    <%--<div class="panel panel-default">--%>
-                        <%--<div class="panel-body">--%>
-                            <%--<div class="row" >--%>
-                                <%--<div class="col-sm-3">--%>
-                                    <%--<label>${drug.name}, ${drug.dose}</label>--%>
-                                <%--</div>--%>
-                                <%--<div class="col-sm-3">--%>
-                                    <%--<label>${drug.price} <fmt:message bundle="${locale}" key="label.currency"/> </label>--%>
-                                <%--</div>--%>
-                                <%--<div class="col-sm-4" id="to-card-button">--%>
-                                    <%--<form name="AddToCardForm" action="/controller">--%>
-                                        <%--<input type="hidden" name="command" value="add-to-card"/>--%>
-                                        <%--<input type="hidden" name="price" value="${drug.price}"/>--%>
-                                        <%--<input type="hidden" name="drugId" value="${drug.id}"/>--%>
-                                        <%--<input type="number" id="amount" class="amount-of-drug" --%>
-                                               <%--required min="1" name="amount" value="" --%>
-                                               <%--placeholder="<fmt:message bundle="${locale}" key="label.amount"/>" --%>
-                                               <%--<c:if test="${sessionScope.user eq null}">disabled</c:if>/>--%>
-                                        <%--<input type="submit" name="submit" class="submit-amount" --%>
-                                               <%--value="<fmt:message bundle="${locale}" key="button.add-to-cart"/>" --%>
-                                               <%--<c:if test="${sessionScope.user eq null}">disabled</c:if>/>--%>
-                                    <%--</form>--%>
-                                <%--</div>--%>
-                                <%--<div class="col-sm-2">--%>
-                                    <%--<form name="AlternateDrug" action="/controller">--%>
-                                        <%--<input type="hidden" name="command" value="to-alternating-drug"/>--%>
-                                        <%--<input type="hidden" name="drugId" value="${drug.id}"/>--%>
-                                        <%--<input type="hidden" name="name" value="${drug.name}"/>--%>
-                                        <%--<input type="hidden" name="price" value="${drug.price}"/>--%>
-                                        <%--<input type="hidden" name="prescription" value="${drug.prescription}"/>--%>
-                                        <%--<input type="hidden" name="dose" value="${drug.dose}"/>--%>
-                                        <%--<input type="submit" name="submit" --%>
-                                               <%--value="<fmt:message bundle="${locale}" key="locale.alternate"/>"--%>
-                                               <%--<c:if test="${sessionScope.user eq null}">disabled placeholder="Only for pharmacists" </c:if>/>/>--%>
-                                    <%--</form>--%>
-                                <%--</div>    --%>
-                            <%--</div>--%>
-                        <%--</div>--%>
-                    <%--</div>    --%>
-                <%--</c:forEach>--%>
+
+                <c:forEach var="drug" items="${sessionScope.drugList}">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="row" >
+                                <div class="col-sm-4">
+                                    <label>${drug.name}, ${drug.dose}мг <c:if test="${drug.prescription eq 1}">
+                                        <span class="glyphicon glyphicon-exclamation-sign" title="requires prescription"></span>
+                                    </c:if> </label>
+                                </div>
+                                <div class="col-sm-2">
+                                    <label>${drug.price} <fmt:message bundle="${locale}" key="label.currency"/> </label>
+                                </div>
+                                <div class="col-sm-4" id="to-card-button">
+                                    <form name="AddToCardForm" action="/controller">
+                                        <input type="hidden" name="command" value="add-to-card"/>
+                                        <input type="hidden" name="price" value="${drug.price}"/>
+                                        <input type="hidden" name="drugId" value="${drug.id}"/>
+                                        <input type="number" id="amount" class="amount-of-drug"
+                                               required min="1" name="amount" value=""
+                                               placeholder="<fmt:message bundle="${locale}" key="label.amount"/>"
+                                               <c:if test="${sessionScope.user eq null}">disabled</c:if>/>
+                                        <input type="submit" name="submit" class="submit-amount"
+                                               value="<fmt:message bundle="${locale}" key="button.add-to-cart"/>"
+                                               <c:if test="${sessionScope.user eq null}">disabled</c:if>/>
+                                    </form>
+                                </div>
+                                <div class="col-sm-2">
+                                    <form name="AlternateDrug" action="/controller">
+                                        <input type="hidden" name="command" value="to-alternating-drug"/>
+                                        <input type="hidden" name="drugId" value="${drug.id}"/>
+                                        <input type="hidden" name="name" value="${drug.name}"/>
+                                        <input type="hidden" name="price" value="${drug.price}"/>
+                                        <input type="hidden" name="prescription" value="${drug.prescription}"/>
+                                        <input type="hidden" name="dose" value="${drug.dose}"/>
+                                        <input type="submit" name="submit"
+                                               value="<fmt:message bundle="${locale}" key="locale.alternate"/>"
+                                               <c:if test="${sessionScope.user eq null}">disabled placeholder="Only for pharmacists"</c:if>/>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </c:forEach>
                 <hr/>
 
-
+                <div class="back-forward">
+                    <form name="Back" class="page-control" action="/controller">
+                        <input type="hidden" name="command" value="seek-drug"/>
+                        <input type="hidden" name="name" value="${sessionScope.name}"/>
+                        <input type="hidden" name="pageNumber" value="${sessionScope.pageNumber - 1}"/>
+                        <input type="hidden" name="elements" value="7"/>
+                        <input type="submit" name="back" value="<fmt:message bundle="${locale}" key="button.previous-page"/>"
+                               <c:if test="${sessionScope.pageNumber eq 1}">disabled </c:if>/>
+                    </form>
+                    <span><label> ${sessionScope.pageNumber} </label></span>
+                    <form name="Forward" class="page-control" action="/controller">
+                        <input type="hidden" name="command" value="seek-drug"/>
+                        <input type="hidden" name="name" value="${sessionScope.name}"/>
+                        <input type="hidden" name="pageNumber" value="${sessionScope.pageNumber + 1}"/>
+                        <input type="hidden" name="elements" value="7"/>
+                        <input type="submit" name="next" value="<fmt:message bundle="${locale}" key="button.next-page"/>"
+                               <c:if test="${sessionScope.pageNumber eq sessionScope.amountOfPages}">disabled </c:if>/>
+                    </form>
+                </div>
             </div>
         </div>
 

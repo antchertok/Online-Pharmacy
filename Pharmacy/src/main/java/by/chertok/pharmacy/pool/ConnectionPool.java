@@ -93,12 +93,13 @@ public class ConnectionPool {
         try {
             Class.forName(driverName);
             availableConnections = new ArrayBlockingQueue<>(poolSize);
-            givenConnections = new ArrayBlockingQueue<>(poolSize);
 
             for (int i = 0; i < poolSize; i++) {
                 ProxyConnection proxyConnection = new ProxyConnection(DriverManager.getConnection(url, user, password));
                 availableConnections.offer(proxyConnection);
             }
+
+            givenConnections = new ArrayBlockingQueue<>(poolSize);
         } catch (ClassNotFoundException | SQLException e) {
             LOGGER.error(e);
             throw new ConnectionPoolException(INITIALIZING_ERROR_MSG, e);

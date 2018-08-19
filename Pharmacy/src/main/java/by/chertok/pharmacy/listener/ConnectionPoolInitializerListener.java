@@ -13,8 +13,7 @@ import javax.servlet.annotation.WebListener;
 
 /**
  * Listener for creating and initializing of {@link ConnectionPool connection pool}
- * and auxiliary classes {@link JdbcHelper JdbcHelper}, {@link DaoKeeper DaoKeeper}
- * and {@link ServiceKeeper ServiceKeeper}
+ * and auxiliary classes {@link JdbcHelper JdbcHelper}
  */
 @WebListener
 public class ConnectionPoolInitializerListener implements ServletContextListener {

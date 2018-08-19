@@ -70,7 +70,7 @@ public class AddToCardCommand implements ICommand {
             LOGGER.error(e);
             wrapper.setRequestAttribute(AttributeName.INFO_CART_MSG, FAILED_TO_ADD);
         } catch (ServiceException e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e);
             wrapper.setSessionAttribute(AttributeName.ERROR_MSG, e.getMessage());
             return new Path(false, PageStorage.ERROR);
         }

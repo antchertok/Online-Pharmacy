@@ -11,7 +11,9 @@ import by.chertok.pharmacy.util.path.Path;
 import by.chertok.pharmacy.util.wrapper.Wrapper;
 import org.apache.log4j.Logger;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ListOrderCommand implements ICommand {
     private static final Logger LOGGER = Logger.getLogger(ListOrderCommand.class);
@@ -34,7 +36,8 @@ public class ListOrderCommand implements ICommand {
     public Path execute(Wrapper wrapper) {
         try{
             long userId = ((User) wrapper.getSessionAttribute(AttributeName.USER)).getId();
-            List<Order> orders = orderService.readByUserId(userId);
+            Set<Order> orders = new LinkedHashSet<>();
+            orders.addAll(orderService.readByUserId(userId));
 
             if (!orders.isEmpty()) {
                 wrapper.setRequestAttribute(AttributeName.ORDERS, orders);
@@ -43,7 +46,7 @@ public class ListOrderCommand implements ICommand {
             }
             return new Path(true, PageStorage.PROFILE);
         } catch(ServiceException e){
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e);
             wrapper.setSessionAttribute(AttributeName.ERROR_MSG, e.getMessage());
             return new Path(false, PageStorage.ERROR);
         }

@@ -48,7 +48,7 @@ public class DenyPrescriptionCommand implements ICommand {
 
             return new Path(false, PageStorage.LIST_PRESCRIPTIONS);
         } catch (ServiceException e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e);
             wrapper.setSessionAttribute(AttributeName.ERROR_MSG, e.getMessage());
             return new Path(false, PageStorage.ERROR);
         }

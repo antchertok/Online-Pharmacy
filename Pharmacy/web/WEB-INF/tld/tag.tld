@@ -9,26 +9,6 @@
     <short-name>myshortname</short-name>
     <uri>pharmacytags</uri>
     <tag>
-        <name>page-listing</name>
-        <tag-class>by.chertok.pharmacy.tag.DrugListingTag</tag-class>
-        <body-content>empty</body-content>
-        <attribute>
-            <name>list</name>
-            <required>true</required>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>elementsOnPage</name>
-            <required>true</required>
-            <rtexprvalue>false</rtexprvalue>
-        </attribute>
-        <attribute>
-            <name>pageNumber</name>
-            <required>true</required>
-            <rtexprvalue>true</rtexprvalue>
-        </attribute>
-    </tag>
-    <tag>
         <name>time-displaying</name>
         <tag-class>by.chertok.pharmacy.tag.TimeDisplayingTag</tag-class>
         <body-content>empty</body-content>
